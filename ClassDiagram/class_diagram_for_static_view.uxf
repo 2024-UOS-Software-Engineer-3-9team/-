@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>336</x>
+      <y>448</y>
+      <w>408</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Task
+--
++task_id: int
++task_name: String
++context: String
++workers: String[]   //user_id[]
++dueDate: String
++isDone: boolean
+--
++Task(name: String, context: String, workers: String[], dueDate: String)
++editTask(name: String, context: String, workers: String[], dueDate: String): void
++completeTask(): void
++press(user_id: String): void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>416</x>
+      <y>184</y>
+      <w>432</w>
+      <h>208</h>
+    </coordinates>
+    <panel_attributes>Project
+--
++project_id: String
++leader: String     //user_id
++members: String[]      //user_id[]
++schedule: Schedule
++tasks: Task[]
++dueDate: String
+--
++Project(leader)
++inviteUser(user_id: String): void
++changeLeader(next_leader: String): void
++deleteMember(user_id: String): void
++createTask(name: String, context: String, workers: String[], dueDate: String): Task
++createNotice(project_id, receiver: String[], message: String): void
++setDueDate(date: String): void
++deleteProject(): void
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>56</x>
+      <y>184</y>
+      <w>320</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>User
+--
++id: String
++password: String
++nickName: String
++projects: Project[]
+--
++User(id: String, password: String, nickName: String)
++login(id: String, password: String): void
++createProject(): Project
++moveToProject(p: Project): void
++changeNickName(nickName: String): void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>752</x>
+      <y>448</y>
+      <w>312</w>
+      <h>136</h>
+    </coordinates>
+    <panel_attributes>Schedule
+--
++schedule_id: String
++availableTimes: boolean[][]
+--
++Schedule()
++setSchedule(user_id: String, individual_available: int[]): void
++requestSchedule(): void
++mergeAvailableTime(): void
++setMeetingTime(all_available: int[]): void
++viewAvailableTime(): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>552</x>
+      <y>384</y>
+      <w>40</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+m1=
+m2=0..n</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>792</x>
+      <y>384</y>
+      <w>40</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+m1=
+m2=0..n</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>368</x>
+      <y>176</y>
+      <w>64</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>10.0;20.0;60.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>72</x>
+      <y>376</y>
+      <w>248</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>Notice
+--
++project_id: String
++receiver: String[]
++message: context
++dueDate: String
+--
++view(receiver, message): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>192</x>
+      <y>320</y>
+      <w>40</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+m1=
+m2=0..n</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+</diagram>
