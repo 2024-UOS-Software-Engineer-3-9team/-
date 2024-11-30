@@ -4,11 +4,13 @@ const oracledb = require("oracledb")
 const express = require("express")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const cors = require('cors')
 
 const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
 
+app.use(cors());
 app.use(express.json());
 
 // JWT 토큰 검증
