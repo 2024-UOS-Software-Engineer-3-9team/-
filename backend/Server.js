@@ -125,7 +125,7 @@ app.post("/auth/login", async(req, res) => {
 //------------홈화면 관련 API
 // 사용자가 속한 프로젝트 조회(홈화면 프로젝트 목록 띄울때 사용)
 app.get("/home/my", authenticateToken, async (req, res) => {
-    const { user_id } = req.user.user_id;
+    const { user_id } = req.user;
     let connection;
     try{
         connection = await connectToDatabase();
@@ -144,7 +144,7 @@ app.get("/home/my", authenticateToken, async (req, res) => {
 
 //사용자 닉네임 변경
 app.post("/auth/mynickname", authenticateToken, async(req, res) => {
-    const {user_id} = req.user.user;
+    const {user_id} = req.user;
     const {nickname} = req.body;
     let connection;
     if(!nickname || nickname.trim() === ""){
@@ -210,23 +210,30 @@ app.post("/home/newprojects", authenticateToken, async (req, res) => {
         }
 
         const result = await connection.execute(
-            `INSERT INTO TABLE_PROJECT (PROJ_NAME, LEADER_ID) 
-             VALUES (:proj_name, :leader_id)`,
-            { proj_name, leader_id },
+            "INSERT INTO TABLE_PROJECT (PROJ_NAME, LEADER_ID) VALUES (:proj_name, :leader_id) RETURNING PROJ_ID INTO :proj_id",
+            { proj_name, leader_id, proj_id: {type:oracledb.NUMBER, dir: oracledb.BIND_OUT} },
             { autoCommit: true }
         );
 
         // PROJ_ID를 다시 조회
-        const queryResult = await connection.execute(
-            `SELECT PROJ_ID FROM TABLE_PROJECT WHERE ROWID = :rowid`,
-            { rowid: result.lastRowid } // lastRowid로 최근 입력된 행 식별
-        );
+        // const queryResult = await connection.execute(
+        //     "SELECT PROJ_ID FROM TABLE_PROJECT WHERE ROWID = :rowid",
+        //     { rowid: result.lastRowid } // lastRowid로 최근 입력된 행 식별
+        // );
 
-        const createdProjId = queryResult.rows[0]?.PROJ_ID;
+        const createdProjId = result.outBinds.proj_id[0];
 
         if (!createdProjId) {
+            await connection.rollback();
             return res.status(500).send("프로젝트 ID를 가져오는 데 실패했습니다.");
         }
+
+        await connection.execute(
+            "INSERT INTO TABLE_USER_PROJ (USER_ID, PROJ_ID) VALUES (:leader_id, :proj_id)",
+            {leader_id, proj_id:createdProjId}
+        );
+
+        await connection.commit();
 
         res.status(201).json({
             message: "프로젝트가 성공적으로 생성되었습니다.",
@@ -272,7 +279,7 @@ app.post("/home/newprojects", authenticateToken, async (req, res) => {
 
 //------------프로젝트 화면 관련 API
 //팀 프로젝트 멤버 조회 (프로젝트 홈화면에서 표기)
-app.get("/projects/:proj_id/members", authenticateToken, async (req, res) => {
+app.get("/projects/:proj_id", authenticateToken, async (req, res) => {
     const { proj_id } = req.params;
     let connection;
     try{
@@ -437,7 +444,7 @@ app.get("/projects/:proj_id/schedules", authenticateToken, async (req, res) => {
 //Task생성
 app.post("/projects/:proj_id/tasks/make", authenticateToken, async (req, res) => {
     const {proj_id} = req.params;
-    const {task_name, duedate, isdone = 'N'} = req.body;
+    const {task_name, duedate, isdone = '0', user_ids} = req.body;
     let connection;
     try{
         connection = await connectToDatabase();
@@ -445,15 +452,63 @@ app.post("/projects/:proj_id/tasks/make", authenticateToken, async (req, res) =>
             return res.status(500).send("DB 연결에 실패했습니다.");
         }
 
-        await connection.execute(
-            "INSERT INTO TABLE_TASK (PROJ_ID, TASK_NAME, DUEDATE, ISDONE) VALUES (:proj_id, :task_name, TO_DATE(:duedate, 'YYYY-MM-DD'), :isdone)",
-            { proj_id, task_name, duedate, isdone },
-            { autoCommit: true }
+        const result = await connection.execute(
+            "INSERT INTO TABLE_TASK (PROJ_ID, TASK_NAME, DUEDATE, ISDONE) VALUES (:proj_id, :task_name, TO_DATE(:duedate, 'YYYY-MM-DD'), :isdone) RETURNING TASK_ID INTO :task_id",
+            { proj_id, task_name, duedate, isdone, task_id: {type:oracledb.NUMBER, dir: oracledb.BIND_OUT}},
+            { autoCommit: false }
         );
+
+        const createdTaskId = result.outBinds.task_id[0];
+
+        if (!createdTaskId) {
+            await connection.rollback();
+            return res.status(500).send("태스크 ID를 가져오는 데 실패했습니다.");
+        }
+
+        //배열순회 추가
+        for(const user_id of user_ids){
+            await connection.execute(
+                "INSERT INTO TABLE_TASK_USER (TASK_ID, USER_ID) VALUES (:task_id, :user_id)",
+                {task_id:createdTaskId, user_id}
+            );
+        }
+
+        await connection.commit();
+
         res.status(201).send("Task가 성공적으로 생성되었습니다.");
     }catch(err){
         console.error(err);
         res.status(500).send("Task 생성 중 오류가 발생했습니다.");
+    }finally{
+        await closeConnection(connection);
+    }
+});
+
+//Task완료
+app.post("/projects/:proj_id/tasks/isdone", authenticateToken, async (req, res) => {
+    const {proj_id} = req.params;
+    const {task_id} = req.body;
+    let connection;
+    try{
+        connection = await connectToDatabase();
+        if(!connection){
+            return res.status(500).send("DB 연결에 실패했습니다.");
+        }
+
+        const result = await connection.execute(
+            "UPDATE TABLE_TASK SET ISDONE = 1 WHERE PROJ_ID = :proj_id AND TASK_ID=:task_id",
+            { proj_id, task_id},
+            { autoCommit: true }
+        );
+
+        if(result.rowsAffected === 0){
+            return res.status(404).send("해당 TASK를 찾을 수 없습니다.")
+        }
+
+        res.status(200).send("Task가 성공적으로 완료처리 되었습니다.");
+    }catch(err){
+        console.error(err);
+        res.status(500).send("Task 완료 처리 중 오류가 발생했습니다.");
     }finally{
         await closeConnection(connection);
     }
@@ -485,7 +540,7 @@ app.get("/projects/:proj_id/tasks", authenticateToken, async (req, res) => {
 //Task수정
 app.post("/projects/:proj_id/tasks/modify", authenticateToken, async (req, res) => {
     const {proj_id} = req.params;
-    const {task_id, task_name, duedate, isdone} = req.body;
+    const {task_id, task_name, duedate, user_ids} = req.body;
 
     let connection;
     try{
@@ -494,14 +549,44 @@ app.post("/projects/:proj_id/tasks/modify", authenticateToken, async (req, res) 
             return res.status(500).send("DB 연결에 실패했습니다.");
         }
 
-        await connection.execute(
-            "UPDATE TABLE_TASK SET TASK_NAME = :task_name, DUEDATE = TO_DATE(:duedate, 'YYYY-MM-DD'), ISDONE = :isdone WHERE PROJ_ID = :proj_id AND TASK_ID = :task_id",
-            {task_name, duedate, isdone, proj_id, task_id},
-            {autoCommit: true}
+        if (!task_name || task_name.trim() === "") {
+            return res.status(400).send("유효한 TASK_NAME을 입력하세요.");
+        }
+        
+        if (!duedate || duedate.trim() === "") {
+            return res.status(400).send("유효한 DUEDATE를 입력하세요.");
+        }
+
+        const result = await connection.execute(
+            "UPDATE TABLE_TASK SET TASK_NAME = :task_name, DUEDATE = TO_DATE(:duedate, 'YYYY-MM-DD') WHERE PROJ_ID = :proj_id AND TASK_ID = :task_id",
+            {task_name, duedate, proj_id, task_id},
+            {autoCommit: false}
         );
+
+        if(result.rowsAffected === 0){
+            return res.status(404).send("해당 TASK를 찾을 수 없습니다.")
+        }
+
+        await connection.execute(
+            "DELETE FROM TABLE_TASK_USER WHERE TASK_ID = :task_id",
+            { task_id }
+        );
+
+        for(const user_id of user_ids){
+            await connection.execute(
+                "INSERT INTO TABLE_TASK_USER (TASK_ID, USER_ID) VALUES (:task_id, :user_id)",
+                {task_id,user_id}
+            );
+        };
+
+        await connection.commit();
+
         res.status(200).send("TASK가 성공적으로 수정되었습니다.");
-    }catch{
+    }catch(err){
         console.error(err);
+        if(connection){
+            await connection.rollback();
+        }
         res.status(500).send("TASK 수정 중 오류가 발생했습니다.");
     }finally{
         await closeConnection(connection);

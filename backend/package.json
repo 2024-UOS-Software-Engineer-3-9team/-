@@ -1,7 +1,7 @@
 {
   "name": "small-work-everyday",
   "version": "1.0.0",
-  "description": "<b>일조매</b> (<b>일</b>을 <b>조</b>금씩 <b>매</b>일매일) <br>",
+  "description": "<b>?��조매</b> (<b>?��</b>?�� <b>�?</b>금씩 <b>�?</b>?��매일) <br>",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
