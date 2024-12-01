@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 interface LoginScreenProps {
   onSignupPress: () => void;
+  onLoginPress: () => void;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onSignupPress }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ onSignupPress, onLoginPress }) => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
 
@@ -31,7 +31,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onSignupPress }) => {
         // AsyncStorage에 토큰 저장
         await AsyncStorage.setItem("accessToken", accessToken);
 
-        console.log("Saved JWT Token:", accessToken);
+
+        // 로그인 성공 시 콜백 호출
+        onLoginPress();
       } else if (response.status === 401) {
         Alert.alert("로그인 실패", "아이디 또는 비밀번호를 확인해주세요.");
       } else {
