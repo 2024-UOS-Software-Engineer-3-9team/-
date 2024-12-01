@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface InviteScreenProps {
   onBackPress: () => void;
@@ -8,6 +9,26 @@ interface InviteScreenProps {
 
 const InviteScreen: React.FC<InviteScreenProps> = ({ onBackPress, projId }) => {
   const [userId, setUserId] = useState("");
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  // AsyncStorage에서 토큰 가져오기
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("accessToken");
+        if (storedToken) {
+          setAccessToken(storedToken);
+        } else {
+          Alert.alert("오류", "로그인이 필요합니다. 다시 로그인 해주세요.");
+        }
+      } catch (error) {
+        console.error("토큰 가져오기 실패:", error);
+        Alert.alert("오류", "토큰을 가져오는 중 문제가 발생했습니다.");
+      }
+    };
+
+    fetchAccessToken();
+  }, []);
 
   const inviteUser = async () => {
     if (!userId.trim()) {
@@ -15,14 +36,23 @@ const InviteScreen: React.FC<InviteScreenProps> = ({ onBackPress, projId }) => {
       return;
     }
 
+    if (!accessToken) {
+      Alert.alert("오류", "유효하지 않은 토큰입니다. 다시 로그인 해주세요.");
+      return;
+    }
+
     try {
-      const response = await fetch(`"ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projId}/invite`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ user_id: userId }),
-      });
+      const response = await fetch(
+        `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projId}/invite`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ user_id: userId }),
+        }
+      );
 
       if (response.status === 201) {
         Alert.alert("성공", "팀원이 성공적으로 초대되었습니다.");
