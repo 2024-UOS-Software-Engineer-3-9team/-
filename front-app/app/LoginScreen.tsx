@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 
+const SERVER_URI = 'ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000';
+
 interface LoginScreenProps {
   onSignupPress: () => void;
   onLoginPress: () => void;

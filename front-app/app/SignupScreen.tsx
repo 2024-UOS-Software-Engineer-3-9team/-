@@ -22,7 +22,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ onSignupComplete }) => {
     }
 
     try {
-      const response = await fetch("ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com", {
+      const response = await fetch("ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
