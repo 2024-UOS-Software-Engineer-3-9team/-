@@ -115,7 +115,7 @@ app.post("/auth/login", async(req, res) => {
             {expiresIn: "7d"}
         );
 
-        res.json({ accessToken });
+        res.status(201).json({ accessToken });
     }catch(err){
         console.error(err);
         res.status(500).send("로그인 중 오류가 발생했습니다.");
@@ -145,7 +145,7 @@ app.get("/home/my", authenticateToken, async (req, res) => {
 });
 
 //사용자 닉네임 변경
-app.post("/auth/mynickname", authenticateToken, async(req, res) => {
+app.put("/auth/mynickname", authenticateToken, async(req, res) => {
     const {user_id} = req.user;
     const {nickname} = req.body;
     let connection;
@@ -172,29 +172,6 @@ app.post("/auth/mynickname", authenticateToken, async(req, res) => {
     }catch(err){
         console.error(err);
         res.status(500).send("닉네임 변경 중 오류가 발생했습니다.");
-    }finally{
-        await closeConnection(connection);
-    }
-});
-
-//모든 알림 알림 조회
-app.get("/home/notifications", authenticateToken, async(req, res) => {
-    const { user_id } = req.user.user_id;
-    let connection;
-    try{
-        connection = await connectToDatabase();
-        if(!connection){
-            return res.status(500).send("DB 연결에 실패했습니다.");
-        }
-
-        const result = await connection.execute(
-            "SELECT PROJ_ID, NOTICE_ID, MESSAGE, DUEDATE FROM TABLE_NOTICE WHERE USER_ID = :user_id",
-            { user_id }
-        );
-        res.json(result.rows);
-    }catch(err){
-        console.error(err);
-        res.status(500).send("알림 조회 중 오류가 발생했습니다.");
     }finally{
         await closeConnection(connection);
     }
@@ -303,31 +280,6 @@ app.get("/projects/:proj_id", authenticateToken, async (req, res) => {
     }
 });
 
-//팀 프로젝트 알림 조회 (프로젝트 홈화면 알림 클릭 시)
-app.get("/projects/:proj_id/notifications", authenticateToken, async(req, res) => {
-    const { proj_id } = req.params;
-    const { user_id } = req.user.user_id;
-    let connection;
-    try{
-        connection = await connectToDatabase();
-        if(!connection){
-            return res.status(500).send("DB 연결에 실패했습니다.");
-        }
-
-        const result = await connection.execute(
-            "SELECT NOTICE_ID, MESSAGE, DUEDATE FROM TABLE_NOTICE WHERE PROJ_ID = :proj_id AND USER_ID = :user_id",
-            { proj_id, user_id }
-        );
-        res.json(result.rows);
-    }catch(err){
-        console.error(err);
-        res.status(500).send("알림 조회 중 오류가 발생했습니다.");
-    }finally{
-        await closeConnection(connection);
-    }
-});
-
-
 //팀원 초대
 app.post("/projects/:proj_id/invite", authenticateToken, async (req,res) => {
     const {proj_id} = req.params;
@@ -395,10 +347,10 @@ app.post("/projects/:proj_id/invite", authenticateToken, async (req,res) => {
 // });
 
 //스케쥴 등록
-app.post("/projects/:proj_id/schedule", authenticateToken, async(req, res) => {
+app.post("/projects/:proj_id/addschedule", authenticateToken, async(req, res) => {
     const { proj_id } = req.params;
-    const {schedule_id, start_time, end_time} = req.body;
-    const { user_id } = req.user.user_id;
+    const { time, date_meet } = req.body;
+    const { user_id } = req.user;
     let connection;
     try{
         connection = await connectToDatabase();
@@ -406,8 +358,8 @@ app.post("/projects/:proj_id/schedule", authenticateToken, async(req, res) => {
             return res.status(500).send("DB 연결에 실패했습니다.");
         }
         await connection.execute(
-            "INSERT INTO TABLE_SCHEDULE (PROJ_ID, SCHEDULE_ID, USER_ID, START_TIME, END_TIME) VALUES (:proj_id, :schedule_id, :user_id, TO_DATE(:start_time, 'YYYY-MM-DD HH24:MI'), TO_DATE(:end_time, 'YYYY-MM-DD HH24:MI'))",
-            {proj_id, schedule_id, user_id, start_time, end_time},
+            "INSERT INTO TABLE_SCHEDULE (PROJ_ID, USER_ID, TIME, DATE_MEET) VALUES (:proj_id, :user_id, :time,TO_DATE(:date_meet, 'YYYY-MM-DD'))",
+            {proj_id, user_id, time, date_meet},
             {autoCommit:true}
         );
         res.status(201).send("스케쥴이 성공적으로 등록되었습니다.");
@@ -419,9 +371,10 @@ app.post("/projects/:proj_id/schedule", authenticateToken, async(req, res) => {
     }
 });
 
-//스케쥴 조회(스케쥴화면 띄울때)
+//스케쥴 조회(스케쥴화면 띄울때)//수정필요
 app.get("/projects/:proj_id/schedules", authenticateToken, async (req, res) => {
     const { proj_id } = req.params;
+    const { start_day, end_day } = req.query;      //한 주의 시작과 끝
     let connection;
     try{
         connection = await connectToDatabase();
@@ -429,14 +382,90 @@ app.get("/projects/:proj_id/schedules", authenticateToken, async (req, res) => {
             return res.status(500).send("DB 연결에 실패했습니다.");
         }
 
+        if (!start_day || !end_day) {
+            return res.status(400).send("start_day와 end_day는 필수 입력값입니다.");
+        }
+
         const result = await connection.execute(
-            "SELECT SCHEDULE_ID, USER_ID, START_TIME, END_TIME FROM SCHEDULE WHERE PROJ_ID = :proj_id",
-            {proj_id}
+            "SELECT SCHEDULE_ID, USER_ID, TIME, DATE_MEET FROM TABLE_SCHEDULE WHERE PROJ_ID = :proj_id AND DATE_MEET BETWEEN TO_DATE(:start_day || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:end_day || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')",
+            {proj_id, start_day, end_day}
         );
         res.json(result.rows);
     }catch(err){
         console.error(err);
         res.status(500).send("스케쥴 조회 중 오류가 발생했습니다.");
+    }finally{
+        await closeConnection(connection);
+    }
+});
+
+//스케쥴 수정 만들것
+app.put("/projects/:proj_id/scheduleUpdate", authenticateToken, async (req, res) => {
+    const { proj_id } = req.params;
+    const { user_id } = req.user;
+    const { new_time, date_meet } = req.body;      //한 주의 시작과 끝
+    let connection;
+    try{
+        connection = await connectToDatabase();
+        if(!connection){
+            return res.status(500).send("DB 연결에 실패했습니다.");
+        }
+
+        if (!date_meet || !new_time) {
+            return res.status(400).send("date_meet, new_time은 필수 입력값입니다.");
+        }
+
+        const result = await connection.execute(
+            "UPDATE TABLE_SCHEDULE SET TIME = :new_time WHERE PROJ_ID = :proj_id AND USER_ID = :user_id AND DATE_MEET = TO_DATE(:date_meet, 'YYYY-MM-DD')",
+            {proj_id, user_id, date_meet, new_time},
+            {autoCommit: true}
+        );
+
+        if (result.rowsAffected === 0) {
+            return res.status(404).send("해당하는 스케줄을 찾을 수 없습니다.");
+        }
+        res.status(201).send("스케쥴 수정이 완료 되었습니다.");
+    }catch(err){
+        console.error(err);
+        res.status(500).send("스케쥴 수정 중 오류가 발생했습니다.");
+    }finally{
+        await closeConnection(connection);
+    }
+});
+
+
+//미팅 만들기
+app.post("/projects/:proj_id/schedule/makeMeet", authenticateToken, async(req, res) => {
+    const { proj_id } = req.params;
+    const {task_name="미팅", duedate, isdone=2} = req.body;
+    let connection;
+    try{
+        connection = await connectToDatabase();
+        if(!connection){
+            return res.status(500).send("DB 연결에 실패했습니다.");
+        }
+        const result = await connection.execute(
+            "INSERT INTO TABLE_TASK (PROJ_ID, TASK_NAME, DUEDATE, ISDONE) VALUES (:proj_id, :task_name, TO_DATE(:duedate, 'YYYY-MM-DD HH24:MI'), :isdone) RETURNING TASK_ID INTO :task_id",
+            //"INSERT INTO TABLE_SCHEDULE (PROJ_ID, SCHEDULE_ID, USER_ID, START_TIME, END_TIME) VALUES (:proj_id, :schedule_id, :user_id, TO_DATE(:start_time, 'YYYY-MM-DD HH24:MI'), TO_DATE(:end_time, 'YYYY-MM-DD HH24:MI'))",
+            {proj_id, task_name, duedate, isdone, task_id: {type:oracledb.NUMBER, dir: oracledb.BIND_OUT}},
+            {autoCommit:false}
+        );
+
+        const createdTaskId = result.outBinds.task_id[0];
+
+        if (!createdTaskId) {
+            await connection.rollback();
+            return res.status(500).send("태스크 ID를 가져오는 데 실패했습니다.");
+        }
+
+
+
+        await connection.commit();
+
+        res.status(201).send("미팅이 성공적으로 등록되었습니다.");
+    }catch(err){
+        console.error(err);
+        res.status(500).send("미팅이 등록 중 오류가 발생했습니다.");
     }finally{
         await closeConnection(connection);
     }
@@ -527,10 +556,34 @@ app.get("/projects/:proj_id/tasks", authenticateToken, async (req, res) => {
         }
 
         const result = await connection.execute(
-            "SELECT TASK_ID, TASK_NAME, DUEDATE, ISDONE FROM TABLE_TASK WHERE PROJ_ID = :proj_id",
+            "SELECT t.TASK_ID, t.TASK_NAME, t.DUEDATE, t.ISDONE, u.USER_ID FROM TABLE_TASK t LEFT JOIN TABLE_TASK_USER u ON t.TASK_ID = u.TASK_ID WHERE t.PROJ_ID = :proj_id",
             {proj_id}
         );
-        res.json(result.rows);
+
+        console.log("쿼리 결과:",result.rows);
+
+        const tasks = {};
+        result.rows.forEach(row => {
+            const taskId = row[0];  // TASK_ID는 첫 번째 열입니다.
+
+            if (!tasks[taskId]) {
+                tasks[taskId] = {
+                    taskId: row[0],
+                    taskName: row[1],
+                    dueDate: row[2],
+                    isDone: row[3],
+                    userIds: []
+                };
+            }
+            
+            if (row[4]) {  // USER_ID는 다섯 번째 열입니다.
+                tasks[taskId].userIds.push(row[4]);
+            }
+        });
+
+        const response = Object.values(tasks);
+        res.json(response);
+        
     }catch(err){
         console.error(err);
         res.status(500).send("Task 조회 중 오류가 발생했습니다.");
@@ -540,7 +593,7 @@ app.get("/projects/:proj_id/tasks", authenticateToken, async (req, res) => {
 });
 
 //Task수정
-app.post("/projects/:proj_id/tasks/modify", authenticateToken, async (req, res) => {
+app.put("/projects/:proj_id/tasks/modify", authenticateToken, async (req, res) => {
     const {proj_id} = req.params;
     const {task_id, task_name, duedate, user_ids} = req.body;
 
@@ -595,10 +648,11 @@ app.post("/projects/:proj_id/tasks/modify", authenticateToken, async (req, res) 
     }
 });
 
-//알림 전송(알림 생성과 같이 사용)
-app.post("/projects/:proj_id/makeNotification", authenticateToken, async (req, res) => {
-    const { user_id, notice_id, message, duedate } = req.body;
-    const { proj_id } = req.params;
+
+//------------알림관련
+//모든 알림 알림 조회
+app.get("/home/notifications", authenticateToken, async(req, res) => {
+    const { user_id } = req.user;
     let connection;
     try{
         connection = await connectToDatabase();
@@ -606,15 +660,74 @@ app.post("/projects/:proj_id/makeNotification", authenticateToken, async (req, r
             return res.status(500).send("DB 연결에 실패했습니다.");
         }
 
-        await connection.execute(
-            "INSERT INTO TABLE_NOTICE (USER_ID, PROJ_ID, NOTICE_ID, MESSAGE, DUEDATE) VALUES (:user_id, :proj_id, :notice_id, :message, TO_DATE(:duedate, 'YYYY-MM-DD'))",
-            { user_id, proj_id, notice_id, message, duedate },
-            { autoCommit: true }
+        const result = await connection.execute(
+            "SELECT PROJ_ID, NOTICE_ID, MESSAGE, DUEDATE FROM TABLE_NOTICE WHERE USER_ID = :user_id",
+            { user_id }
         );
+        res.json(result.rows);
+    }catch(err){
+        console.error(err);
+        res.status(500).send("알림 조회 중 오류가 발생했습니다.");
+    }finally{
+        await closeConnection(connection);
+    }
+});
+
+//알림 전송(알림 생성과 같이 사용)
+app.post("/projects/:proj_id/makeNotification", authenticateToken, async (req, res) => {
+    const { message, user_ids } = req.body;
+    const { proj_id } = req.params;
+    let connection;
+
+    const today = new Date();
+    const kstOffset = 9 * 60 * 60 * 1000; // 한국 표준시는 UTC+9
+    const kstDate = new Date(today.getTime() + kstOffset);
+    const duedate = kstDate.toISOString().split('T')[0];
+
+    try{
+        connection = await connectToDatabase();
+        if(!connection){
+            return res.status(500).send("DB 연결에 실패했습니다.");
+        }
+
+        for(const user_id of user_ids){
+            await connection.execute(
+                "INSERT INTO TABLE_NOTICE (USER_ID, PROJ_ID, MESSAGE, DUEDATE) VALUES (:user_id, :proj_id, :message, TO_DATE(:duedate, 'YYYY-MM-DD'))",
+                { user_id, proj_id, message, duedate },
+                { autoCommit: false }
+            );
+        }
+
+        await connection.commit();
+
         res.status(201).send("알림이 성공적으로 전송되었습니다.");
     }catch(err){
         console.error(err);
         res.status(500).send("알림 전송 중 오류가 발생했습니다.");
+    }finally{
+        await closeConnection(connection);
+    }
+});
+
+//팀 프로젝트 알림 조회 (프로젝트 홈화면 알림 클릭 시)
+app.get("/projects/:proj_id/notifications", authenticateToken, async(req, res) => {
+    const { proj_id } = req.params;
+    const { user_id } = req.user;
+    let connection;
+    try{
+        connection = await connectToDatabase();
+        if(!connection){
+            return res.status(500).send("DB 연결에 실패했습니다.");
+        }
+
+        const result = await connection.execute(
+            "SELECT NOTICE_ID, MESSAGE, DUEDATE FROM TABLE_NOTICE WHERE PROJ_ID = :proj_id AND USER_ID = :user_id",
+            { proj_id, user_id }
+        );
+        res.json(result.rows);
+    }catch(err){
+        console.error(err);
+        res.status(500).send("알림 조회 중 오류가 발생했습니다.");
     }finally{
         await closeConnection(connection);
     }
