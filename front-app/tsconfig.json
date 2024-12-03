@@ -1,5 +1,6 @@
 {
-  "extends": "expo/tsconfig.base",
+  /*"extends": "expo/tsconfig.base", 일단 효근이 실행할 때 링크였음*/
+  "extends": "./node_modules/expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
     "paths": {
