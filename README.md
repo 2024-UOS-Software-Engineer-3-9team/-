@@ -2,6 +2,10 @@
 <b>일조매</b> (<b>일</b>을 <b>조</b>금씩 <b>매</b>일매일)
 <br>
 
+# Project Scope
+서울시립대학교 컴퓨터과학부 2024년 소프트웨어공학 프로젝트로, Software Development Life-Cycle 을 기반으로 객체지향
+소프트웨어 공학 방법론을 적용하여 조별과제 도우미 어플 개발
+
 # Project Team Name
 <b>너나해</b> (<b>너</b>랑 <b>나</b>랑 <b>해</b>보자)
 <br>
