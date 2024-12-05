@@ -11,7 +11,11 @@ import ProjectLobbyScreen from "./ProjectLobbyScreen";
 import AlarmTeamScreen from "./AlarmTeamScreen";
 import InviteScreen from "./InviteScreen";
 import ScheduleLobbyScreen from "./ScheduleLobbyScreen";
-import InsertSchedulePopup from "./InsertSchedulePopup";
+// import InsertSchedulePopup from "./InsertSchedulePopup";
+import CalenderLobbyScreen from "./CalenderLobbyScreen";
+import DaysDetailScreen from "./DaysDetailScreen";
+import GenerateTaskScreen from "./GenerateTaskScreen";
+import TODOModifyTaskPopup from "./TODOModifyTaskPopup";
 
 export default function Index() {
   const [currentScreen, setCurrentScreen] = useState<
@@ -26,6 +30,10 @@ export default function Index() {
     | "AlarmTeam"
     | "Invite"
     | "ScheduleLobby"
+    | "CalenderLobby"
+    | "DaysDetail"
+    | "GenerateTask"
+    | "TODOModifyTask"
   >("Splash");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); // 선택된 프로젝트 ID 저장
   const [isPopupVisible, setPopupVisible] = useState(false); // 팝업 표시 상태
@@ -71,7 +79,7 @@ export default function Index() {
       case "ProjectLobby":
         return (
           <ProjectLobbyScreen
-            projectId={selectedProjectId} // 선택된 프로젝트 ID 전달
+            projectId={selectedProjectId!} // 선택된 프로젝트 ID 전달
             onBackPress={() => setCurrentScreen("ProjectList")}
             onAlarmPress={() => setCurrentScreen("AlarmTeam")}
             onAddMemberPress={() => setCurrentScreen("Invite")}
@@ -81,14 +89,24 @@ export default function Index() {
       case "AlarmTeam":
         return <AlarmTeamScreen onBackPress={() => setCurrentScreen("ProjectLobby")} />;
       case "Invite":
-        return <InviteScreen onBackPress={() => setCurrentScreen("ProjectLobby")} />;
+        return <InviteScreen
+        projId={selectedProjectId!} // 선택된 프로젝트 ID 전달
+        onBackPress={() => setCurrentScreen("ProjectLobby")} />;
       case "ScheduleLobby":
         return (
           <ScheduleLobbyScreen
             onBackPress={() => setCurrentScreen("ProjectLobby")}
-            onOpenPopup={() => setPopupVisible(true)} // 팝업 열기
+            // onOpenPopup={() => setPopupVisible(true)} // 팝업 열기
           />
         );
+      case "CalenderLobby":
+        return <CalenderLobbyScreen onBackPress={() => setCurrentScreen("ProjectLobby")} />;
+      case "DaysDetail":
+        return <DaysDetailScreen onBackPress={() => setCurrentScreen("CalenderLobby")} />;
+      case "GenerateTask":
+        return <GenerateTaskScreen onBackPress={() => setCurrentScreen("CalenderLobby")} />;
+      case "TODOModifyTask":
+        return <TODOModifyTaskPopup />;
       default:
         return null;
     }
@@ -104,7 +122,7 @@ export default function Index() {
         transparent={true}
         onRequestClose={() => setPopupVisible(false)} // 뒤로가기 시 닫기
       >
-        <InsertSchedulePopup onClose={() => setPopupVisible(false)} />
+        {/* <InsertSchedulePopup onClose={() => setPopupVisible(false)} /> */}
       </Modal>
     </View>
   );

@@ -1,18 +1,27 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import InsertSchedulePopup from "./InsertSchedulePopup";
 
 interface ScheduleLobbyScreenProps {
   onBackPress: () => void;
-  onOpenPopup: () => void; // 팝업 열기 콜백
 }
 
 const days = ["월", "화", "수", "목", "금", "토", "일"];
 const times = [...Array(24)].map((_, i) => `${i}:00`);
 
-const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
-  onBackPress,
-  onOpenPopup,
-}) => {
+const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({ onBackPress }) => {
+  const [isPopupVisible, setPopupVisible] = useState(false);
+  const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set()); // 전체 선택 상태
+
+  const handleConfirm = (newSelectedCells: Set<string>) => {
+    setSelectedCells(newSelectedCells); // 팝업에서 선택된 상태 저장
+    setPopupVisible(false); // 팝업 닫기
+  };
+
+  const handleCancel = () => {
+    setPopupVisible(false); // 팝업 닫기, 선택 상태 유지
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -25,7 +34,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
       {/* 시간표 */}
       <View style={styles.tableContainer}>
         <View style={styles.row}>
-          <Text style={styles.headerCell}></Text> {/* 빈 셀 */}
+          <Text style={styles.headerCell}></Text>
           {days.map((day, index) => (
             <Text key={index} style={styles.headerCell}>
               {day}
@@ -35,22 +44,35 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
         {times.map((time, rowIndex) => (
           <View key={rowIndex} style={styles.row}>
             <Text style={styles.timeCell}>{time}</Text>
-            {days.map((_, colIndex) => (
-              <TouchableOpacity key={colIndex} style={styles.cell}></TouchableOpacity>
-            ))}
+            {days.map((_, colIndex) => {
+              const cellKey = `${rowIndex}-${colIndex}`;
+              const isSelected = selectedCells.has(cellKey);
+              return (
+                <View
+                  key={colIndex}
+                  style={[styles.cell, isSelected && styles.selectedCell]}
+                ></View>
+              );
+            })}
           </View>
         ))}
       </View>
 
-      {/* 등록 및 미팅 시간 버튼 */}
+      {/* 등록 버튼 */}
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.actionButton} onPress={onOpenPopup}>
-          <Text style={styles.buttonText}>등록</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={onOpenPopup}>
-          <Text style={styles.buttonText}>미팅 시간 정하기</Text>
+        <TouchableOpacity style={styles.actionButton} onPress={() => setPopupVisible(true)}>
+          <Text style={styles.buttonText}>시간 등록</Text>
         </TouchableOpacity>
       </View>
+
+      {/* 팝업 */}
+      {isPopupVisible && (
+        <InsertSchedulePopup
+          initialSelectedCells={selectedCells} // 기존 상태 전달
+          onClose={handleCancel} // 취소 시 팝업 닫기
+          onConfirm={handleConfirm} // 확인 시 상태 저장
+        />
+      )}
     </View>
   );
 };
@@ -104,6 +126,9 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 0.5,
     borderColor: "#CCCCCC",
+  },
+  selectedCell: {
+    backgroundColor: "green", // 선택된 셀 강조
   },
   buttonRow: {
     flexDirection: "row",

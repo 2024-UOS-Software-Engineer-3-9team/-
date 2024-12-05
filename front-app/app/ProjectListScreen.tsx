@@ -57,9 +57,17 @@ const ProjectListScreen: React.FC<ProjectListScreenProps> = ({
       if (!response.ok) {
         throw new Error("서버 오류");
       }
-
+      
       const data = await response.json();
-      setProjects(data); // 데이터를 상태에 저장
+    
+      // 배열을 객체 형태로 변환
+      const transformedData = data.map((item: any) => ({
+        PROJ_ID: item[0],
+        PROJ_NAME: item[1],
+        LEADER_ID: item[2],
+      }));
+
+      setProjects(transformedData); // 데이터를 상태에 저장
     } catch (error) {
       console.error("프로젝트를 가져오는 중 오류 발생:", error);
     } finally {
