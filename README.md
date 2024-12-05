@@ -34,8 +34,36 @@
 |3| D-Day 기능 |분배받은 역할 D-Day (다른 사람이 재촉을 안해도) / 독촉하기 버튼(상대 알림 띄우는)|추가 예정|
 |4| todo list 기능 | |개발중 |
 
+## Highlighted Features
+
+## Project Constraints
+
+## High Level Architecture
+
+## Technology Stacks
+| | |
+|-----|-----|
+| Front-end | |
+| Back_end | |
+| DataBase | sqldeveloper (ORACLE 기반) |
+
+## Installation Guideline
+
+## Project Deliverables
+| Document | Link |
+|----------|--------------------------------------|
+| 요구사항 분석 명세서 | https://docs.google.com/document/d/1IRIgeb5XNz910ra9g0WLj9rM0TVX-vw1BN4duwvAbQM/edit?tab=t.0 |
+| Software Architecture ||
+| Software Design ||
+| UI Design ||
+| Coding Standard | |
+| Code ||
+| Test Case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
+
+## Repository Structure
+
 ## Project Team Members
-|  학번  | 이름 | role ||
+|  학번  | 이름 | role | |
 |-----------|------|----------|----|
 |2020920002 | 구효근 | Front-end | 조장 |
 |2020920019 | 문윤서 | Front-end | |
@@ -43,8 +71,3 @@
 |2022920001 | 강민지 | DataBase | |
 |2022920007 | 김나린 | DataBase | |
 |2022920022 | 류수화 | Front-end | |
-
-
-
-
-## TODO
