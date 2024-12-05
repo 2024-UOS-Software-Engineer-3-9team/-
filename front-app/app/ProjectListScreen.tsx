@@ -1,59 +1,97 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage 임포트
+
+interface Project {
+  PROJ_ID: string;
+  PROJ_NAME: string;
+  LEADER_ID: string;
+}
 
 interface ProjectListScreenProps {
   onSettingsPress: () => void;
   onAlarmPress: () => void;
   onAddProjectPress: () => void;
-  onProjectPress: (projectId: string) => void; // 프로젝트로 이동하는 콜백 추가
+  onProjectPress: (projectId: string) => void;
 }
-
-const projects = [
-  {
-    id: "1",
-    title: "일조매 개발",
-    progress: 37,
-    tasks: ["고양이 밥주기 (11/17)", "즐거운 개발 (11/30)"],
-    nextMeeting: "11/20 오후 7시",
-  },
-  {
-    id: "2",
-    title: "일조매 개발",
-    progress: 37,
-    tasks: ["고양이 밥주기 (11/17)", "즐거운 개발 (11/30)"],
-    nextMeeting: "11/20 오후 7시",
-  },
-  {
-    id: "3",
-    title: "일조매 개발",
-    progress: 37,
-    tasks: ["고양이 밥주기 (11/17)", "즐거운 개발 (11/30)"],
-    nextMeeting: "11/20 오후 7시",
-  },
-];
 
 const ProjectListScreen: React.FC<ProjectListScreenProps> = ({
   onSettingsPress,
   onAlarmPress,
   onAddProjectPress,
-  onProjectPress, // 프로젝트 이동 콜백
+  onProjectPress,
 }) => {
-  const renderItem = ({ item }: { item: typeof projects[0] }) => (
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [accessToken, setToken] = useState<string | null>(null); // 토큰 상태
+
+  // AsyncStorage에서 토큰을 가져오는 함수
+  const fetchToken = async () => {
+    try {
+      const storedToken = await AsyncStorage.getItem("accessToken"); // "token" 키로 저장된 토큰을 가져옴
+      if (storedToken) {
+        setToken(storedToken); // 가져온 토큰을 상태에 저장
+      }
+    } catch (error) {
+      console.error("토큰을 가져오는 중 오류 발생:", error);
+    }
+  };
+
+  // 서버에서 프로젝트 목록을 가져오는 함수
+  const fetchProjects = async () => {
+    if (!accessToken) {
+      console.log("토큰이 없습니다.");
+      return; // 토큰이 없으면 API 호출을 하지 않음
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/home/my", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`, // 토큰을 Authorization 헤더에 포함
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("서버 오류");
+      }
+
+      const data = await response.json();
+      setProjects(data); // 데이터를 상태에 저장
+    } catch (error) {
+      console.error("프로젝트를 가져오는 중 오류 발생:", error);
+    } finally {
+      setLoading(false); // 로딩 완료
+    }
+  };
+
+  useEffect(() => {
+    fetchToken(); // 컴포넌트가 마운트될 때 토큰을 가져옴
+  }, []);
+
+  useEffect(() => {
+    if (accessToken) {
+      fetchProjects(); // 토큰이 있을 때만 프로젝트 목록을 가져옴
+    }
+  }, [accessToken]);
+
+  // 로딩 상태에 따른 UI 처리
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>로딩 중...</Text>
+      </View>
+    );
+  }
+
+  const renderItem = ({ item }: { item: Project }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardProgress}>{item.progress}%</Text>
+        <Text style={styles.cardTitle}>{item.PROJ_NAME}</Text>
       </View>
-      <View style={styles.cardBody}>
-        <Text style={styles.cardTaskHeader}>진행 중 TASK</Text>
-        {item.tasks.map((task, index) => (
-          <Text key={index} style={styles.cardTask}>
-            {index + 1}. {task}
-          </Text>
-        ))}
-        <Text style={styles.cardMeeting}>다음 미팅 시간: {item.nextMeeting}</Text>
-      </View>
-      <TouchableOpacity style={styles.cardButton} onPress={() => onProjectPress(item.id)}>
+      <TouchableOpacity style={styles.cardButton} onPress={() => onProjectPress(item.PROJ_ID)}>
         <Text style={styles.cardButtonText}>바로가기</Text>
       </TouchableOpacity>
     </View>
@@ -78,7 +116,7 @@ const ProjectListScreen: React.FC<ProjectListScreenProps> = ({
       <FlatList
         data={projects}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.PROJ_ID}
         contentContainerStyle={styles.list}
       />
 
@@ -134,27 +172,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000000",
   },
-  cardProgress: {
-    fontSize: 18,
-    color: "#000000",
-  },
-  cardBody: {
-    marginTop: 8,
-  },
-  cardTaskHeader: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000000",
-  },
-  cardTask: {
-    fontSize: 14,
-    color: "#000000",
-  },
-  cardMeeting: {
-    fontSize: 12,
-    color: "#555555",
-    marginTop: 8,
-  },
   cardButton: {
     backgroundColor: "#0066FF",
     borderRadius: 8,
@@ -185,6 +202,12 @@ const styles = StyleSheet.create({
   floatingButtonText: {
     fontSize: 24,
     color: "#4A90E2",
+  },
+  loadingText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: 20,
   },
 });
 
