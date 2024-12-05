@@ -1,26 +1,95 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface ProjectLobbyScreenProps {
+  projectId: string;
   onBackPress: () => void;
   onAlarmPress: () => void;
   onAddMemberPress: () => void;
   onSchedulePress: () => void;
 }
 
-const participants = [
-  { id: "1", name: "구준표", role: "UI, React API", tasks: ["과제 제출 준비 (~11/18)", "클래스 다이어그램 (~11/17)"] },
-  { id: "2", name: "문준혁", role: "UI, React API", tasks: ["UI 요소 작업 (~11/18)", "레이아웃 만들기 (~11/17)"] },
-  { id: "3", name: "유지호", role: "UI, 기획", tasks: ["UI creative 작업 (~11/18)"] },
-];
-
 const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
+  projectId,
   onBackPress,
   onAlarmPress,
   onAddMemberPress,
   onSchedulePress,
 }) => {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [projectData, setProjectData] = useState<any>(null);
+  // AsyncStorage에서 토큰 가져오기
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("accessToken");
+        if (storedToken) {
+          setAccessToken(storedToken);
+        } else {
+          Alert.alert("오류", "로그인이 필요합니다. 다시 로그인 해주세요.");
+        }
+      } catch (error) {
+        console.error("토큰 가져오기 실패:", error);
+        Alert.alert("오류", "토큰을 가져오는 중 문제가 발생했습니다.");
+      }
+    };
+
+    fetchAccessToken();
+  }, []);
+  
   const [activeTab, setActiveTab] = useState<"구성원" | "스케줄">("구성원");
+
+  const participants = [
+    { id: "1", name: "구준표" },
+    { id: "2", name: "문준혁" },
+    { id: "3", name: "유지호" },
+  ];
+
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      if (!accessToken) return;
+
+      try {
+        const response = await fetch(
+          `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+
+          console.log(data);
+    
+          // 배열을 객체 형태로 변환
+          const transformedData = data.map((item: any) => ({
+            id: item[0],
+            name: item[1],
+          }));
+
+          console.log(transformedData);
+
+          setProjectData(transformedData); // 상태에 저장
+        } else if (response.status === 400) {
+          const errorData = await response.json();
+          Alert.alert("실패", errorData.message || "요청이 실패했습니다.");
+        } else {
+          Alert.alert("실패", "알 수 없는 오류가 발생했습니다.");
+        }
+      } catch (error) {
+        console.error(error);
+        Alert.alert("에러", "네트워크 오류가 발생했습니다.");
+      }
+    };
+
+    fetchProjectData(); // 비동기 함수 호출
+  }, [accessToken, projectId]);
 
   return (
     <View style={styles.container}>
@@ -35,16 +104,10 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
       </View>
       {activeTab === "구성원" && (
         <FlatList
-          data={participants}
+          data={projectData}
           renderItem={({ item }) => (
             <View style={styles.participantCard}>
               <Text style={styles.cardTitle}>{item.name}</Text>
-              <Text style={styles.cardRole}>({item.role})</Text>
-              {item.tasks.map((task, index) => (
-                <Text key={index} style={styles.cardTask}>
-                  {index + 1}. {task}
-                </Text>
-              ))}
               <TouchableOpacity style={styles.cardButton}>
                 <Text style={styles.cardButtonText}>독촉하기</Text>
               </TouchableOpacity>
