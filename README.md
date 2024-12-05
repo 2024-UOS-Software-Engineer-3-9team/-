@@ -12,7 +12,7 @@
 ## Project Duration
 2024년 2학기
 
-## Project Description
+## Project Description(지우고 Highlighted Features로 합칠 계획)
 [개발 목적]
 - 팀 프로젝트 진행 보조 앱 개발
 
@@ -26,7 +26,7 @@
 <br>
 <br>
 
-## Description
+## Description(지우고 Highlighted Features로 합칠 계획)
 | # | 기능 | 설명 | 개발 현황 |
 |-|------|--------------| ------ |
 |1| 팀원끼리 시간 맞추는 기능 | 5명 정도만 되도 일정 조정이 번거로워서 시간표를 연동해서 공통 시간을 잡아낼 수 있도록| 개발중 |
@@ -45,7 +45,7 @@
 |-----|-----|
 | Front-end | |
 | Back_end | |
-| DataBase | sqldeveloper (ORACLE 기반) |
+| DataBase | SQL developer (ORACLE 기반) |
 
 ## Installation Guideline
 
@@ -56,14 +56,17 @@
 | Software Architecture ||
 | Software Design ||
 | UI Design ||
-| Coding Standard | |
+| Coding Standard | https://docs.google.com/document/d/1OTgrz8aq_iY2XzI8aQ46IBM2eJAir6mhs-IAobRmp84/edit?tab=t.0 |
 | Code ||
 | Test Case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
 
 ## Repository Structure
+| Name | |
+|------|------|
+| | |
 
 ## Project Team Members
-|  학번  | 이름 | role | |
+|  학번  | 이름 | role | 비고 |
 |-----------|------|----------|----|
 |2020920002 | 구효근 | Front-end | 조장 |
 |2020920019 | 문윤서 | Front-end | |
