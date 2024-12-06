@@ -32,7 +32,7 @@
 |4| 캘린더 기능 | 등록된 Task 및 회의 시간을 캘린더에 표시하여 한 눈에 알아볼 수 있도록 한다. |
 
 [Demo Video]
-
+- 추가 예정
 <br>
 
 ## Project Constraints
@@ -46,7 +46,7 @@
 | 분야 | Tools |
 |:------:|------|
 | Front-end | Figma, React api |
-| Back-end | Node js |
+| Back-end | Node.js, Express.js |
 | DataBase | SQL developer (ORACLE 기반) |
 
 ## Installation Guideline
@@ -56,14 +56,9 @@
 | Document | Link |
 |----------|--------------------------------------|
 | 요구사항 분석 명세서 | https://docs.google.com/document/d/1IRIgeb5XNz910ra9g0WLj9rM0TVX-vw1BN4duwvAbQM/edit?tab=t.0 |
-| Architecture 및 Design Documents |[Software Architecture] 
-- temp
-[Software Design]
-- temp
-[UI Design]
-- temp |
+| Architecture 및 Design Documents | |
 | Coding Standard | https://docs.google.com/document/d/1OTgrz8aq_iY2XzI8aQ46IBM2eJAir6mhs-IAobRmp84/edit?tab=t.0 |
-| Code ||
+| Code | 추가 예정 |
 | Test Case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
 <br>
 
