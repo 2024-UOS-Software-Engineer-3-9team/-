@@ -39,7 +39,7 @@
 ## Project Constraints
 
 ## High Level Architecture
-<img src = "![High_Level_Architecture](https://github.com/user-attachments/assets/509b1a36-2180-44cc-99ad-e6798c76e70f)">
+![High_Level_Architecture](https://github.com/user-attachments/assets/509b1a36-2180-44cc-99ad-e6798c76e70f)
 
 ## Technology Stacks
 | 분야 | Tools |
