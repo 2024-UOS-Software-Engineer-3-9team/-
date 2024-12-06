@@ -66,9 +66,9 @@
 ## Repository Structure
 | Directory Name | Contents |
 |:--------------:|-------------|
-| /README | 본 프로젝트에 대한 모든 description |
+| /README | 프로젝트에 대한 모든 description |
 | /proposal/SOW.md | 프로젝트 proposal 내용 |
-| /artifacts ||
+| /artifacts |- requirements <br> - high-level architecture <br> - uml design <br> - ui design <br> - coding standard <br> - test case + test results |
 | /reports | - midterm presentation slides <br> - final presentation slides <br> - demo video |
 | /UI, 피그마 | |
 | /front-app | |
