@@ -71,8 +71,8 @@
 | /artifacts | - Coding Standard_너나해.docx <br> - DB_Structure.jpg <br> - High-level Architecture UML Diagrams Document_너나해.docx <br> - README.md <br> - SRS_너나해.docx <br> - SRS-review.docx <br> - UI Design Document_너나해.docx <br> - class_diagram_for_static_view.uxf <br> - figma_flow.png <br> - figma_전체사진.png <br> - sequence_for_usecase_schedule.uxf <br> - sequence_for_usecase_task.uxf <br> - 일조매.fig <br> - 일조매팀 Test Cases.xlsx |
 | /reports | - midterm presentation slides <br> - final presentation slides <br> - demo video |
 | /UI, 피그마 | UI design 스크린샷 및 figma code |
-| /front-app |  |
-| /backend |  |
+| /front-app | front-end 개발 code |
+| /backend | bakc-end 개발 code |
 | /classroom | 수업시간에 사용한 문서들 |
 
 ## Project Team Members
