@@ -23,15 +23,27 @@ interface GenerateTaskScreenProps {
 
 const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ onBackPress }) => {
   return (
-    <Box
+    <Box                        //전체 파란색 배경
       sx={{
         backgroundColor: "#4d9cff",
         display: "flex",
         justifyContent: "center",
         width: "100%",
-        height: "100vh",
       }}
     >
+      <Typography       //프로젝트 이름
+        variant="h3"
+        sx={{
+          position: "absolute",
+          top: 40,
+          left: 250,
+          color: "white",
+          fontWeight: "bold",
+          zIndex: 10,
+        }}
+      >
+        일조매 개발
+      </Typography>
       <Container
         sx={{
           backgroundColor: "#4d9cff",
@@ -45,29 +57,18 @@ const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ onBackPress }) 
             position: "absolute",
             width: 312,
             height: 621,
-            top: 124,
-            left: 24,
+            top: 102,
+            left: 10,
             backgroundColor: "white",
             padding: 2,
           }}
         >
-          <Typography variant="h4" fontWeight="bold" sx={{ mb: 2 }}>
+          <Typography 
+          variant="h4" fontWeight="bold" sx={{ mb: 2 }}>
             Task 생성
           </Typography>
 
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="h6" fontWeight="bold">
-              Task 이름
-            </Typography>
-            <TextField
-              variant="outlined"
-              fullWidth
-              sx={{ mt: 1 }}
-              placeholder="Task 이름"
-            />
-          </Box>
-
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 2 }}> 
             <Typography variant="h6" fontWeight="bold">
               마감시한
             </Typography>
@@ -200,59 +201,68 @@ const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ onBackPress }) 
             </Button>
           </Box>
         </Box>
-
-        <Box
-          sx={{
-            position: "fixed",
-            width: 360,
-            height: 91,
-            top: 0,
-            left: 0,
-            backgroundColor: "#4d9cff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: 2,
-          }}
-        >
-          <Typography variant="h4" fontWeight="bold" color="white">
-            일조매 개발
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <NotificationsIcon sx={{ color: "white", mr: 2 }} />
-            <ArrowBackIcon sx={{ color: "white" }} />
-          </Box>
-        </Box>
        
-        <Box
-          sx={{
-            position: "absolute",
-            width: 360,
-            height: 30,
-            bottom: 0,
-            left: 0,
-            display: "flex",
-            justifyContent: "space-around",
-            backgroundColor: "#4d9cff",
-            padding: 1,
-          }}
-        >
-          <Button
-            startIcon={<CalendarTodayIcon />}
-            sx={{ variant:"h6", color: "white", flex: 1 }}
+        <Box         //캘린더 하단 바 
+            sx={{
+              position: "absolute",
+              width: 361,
+              height: 36,
+              top: 765,
+              left: 0,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
           >
-            캘린더
-          </Button>
-          <Button 
-            startIcon={<GroupIcon />} 
-            sx={{ variant:"h6", color: "black", flex: 1, backgroundColor: "#ffffff", }}>
-            구성원
-          </Button>
-          <Button 
-            startIcon={<ScheduleIcon />}            
-            sx={{ variant:"h6", color: "black", flex: 1, backgroundColor: "#ffffff", }}>
-            스케쥴
-          </Button>
+            <Button
+              variant="contained"
+              sx={{
+                width: 120,
+                height: 36,
+                backgroundColor: "#4d9cff",
+                borderRadius: 1,
+                pointerEvents: "none"
+              }}
+              disabled={true}
+            >
+              <Typography
+                variant="h6"
+                sx={{ color: "white", fontWeight: "bold" }}
+              >
+                캘린더
+              </Typography>
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                width: 120,
+                height: 36,
+                backgroundColor: "white",
+                borderRadius: 1,
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{ color: "black", fontWeight: "bold" }}
+              >
+                구성원
+              </Typography>
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                width: 120,
+                height: 36,
+                backgroundColor: "white",
+                borderRadius: 1,
+              }}
+              >
+              <Typography
+                variant="h6"
+                sx={{ color: "black", fontWeight: "bold" }}
+              >
+                스케쥴
+              </Typography>
+            </Button>
         </Box>
       </Container>
     </Box>
