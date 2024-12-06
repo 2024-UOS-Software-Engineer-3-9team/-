@@ -56,7 +56,12 @@
 | Document | Link |
 |----------|--------------------------------------|
 | 요구사항 분석 명세서 | https://docs.google.com/document/d/1IRIgeb5XNz910ra9g0WLj9rM0TVX-vw1BN4duwvAbQM/edit?tab=t.0 |
-| Architecture 및 Design Documents |[Software Architecture] - [Software Design] - [UI Design] |
+| Architecture 및 Design Documents |[Software Architecture] 
+- temp
+[Software Design]
+- temp
+[UI Design]
+- temp |
 | Coding Standard | https://docs.google.com/document/d/1OTgrz8aq_iY2XzI8aQ46IBM2eJAir6mhs-IAobRmp84/edit?tab=t.0 |
 | Code ||
 | Test Case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
