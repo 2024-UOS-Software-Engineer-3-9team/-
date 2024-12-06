@@ -36,10 +36,11 @@
 - Coding Standard
 - Source Code
 - Test Case 및 결과
+<br>
 
 ## Project Constraints
-
-
+- 본 프로젝트는 한 학기 내에 개발되어야 하므로, 
+<br>
 
 ## Project Team Members
 | Student Number | Name | Role | etc |
