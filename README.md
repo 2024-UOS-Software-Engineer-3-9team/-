@@ -24,7 +24,7 @@
 
 ## Highlighted Features
 #### [구현 features]
-|  | Feature | Discription | 
+|  | Feature | Description | 
 |-|:------:|--------------|
 |1| Task 기능 | 조별과제에서 각 팀원이 맡은 일을 to do list 형태로 표시한다. Task의 마감일, 담당자가 함께 표시된다. |
 |2| 독촉 기능 | 각 Task 별로 독촉 버튼이 있어 다른 팀원이 독촉 버튼을 누르면 Task 담당자의 핸드폰에 독촉 알림이 간다. |
@@ -64,12 +64,12 @@
 | Test case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
 
 ## Repository Structure
-| Directory Name | Discription |
+| Directory Name | Description |
 |:--------------:|-------------|
-| /README||
+| /README ||
 | /proposal/SOW.md ||
 | /artifacts ||
-| /reports | |
+| /reports | - 중간 발표 <br> - 최종 발표 <br> - 데모 비디오|
 
 ## Project Team Members
 | Student Number | Name | Role | etc |
