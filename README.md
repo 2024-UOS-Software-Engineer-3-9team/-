@@ -16,10 +16,10 @@
 
 ## Project Description
 [개발 목적]
-팀 프로젝트를 진행하다 보면 직무 유기, 시간 조율의 어려움 등 프로젝트의 진행을 방해하는 상황이 발생한다. '일조매'는 업무 분배 및 독촉 기능, 회의 시간 조율 기능 등의 팀플 보조 기능을 제공하여 팀 프로젝트의 순탄한 진행을 돕고자 한다.
+- 팀 프로젝트를 진행하다 보면 직무 유기, 시간 조율의 어려움 등 프로젝트의 진행을 방해하는 상황이 발생한다. '일조매'는 업무 분배 및 독촉 기능, 회의 시간 조율 기능 등의 팀플 보조 기능을 제공하여 팀 프로젝트의 순탄한 진행을 돕고자 한다.
 
 [사용 대상]
-팀 프로젝트가 필요한 사람들 (ex.개발 동아리, 조별 과제를 하는 대학생들)
+- 팀 프로젝트가 필요한 사람들 (ex.개발 동아리, 조별 과제를 하는 대학생들)
 <br>
 
 ## Highlighted Features
@@ -56,9 +56,7 @@
 | Document | Link |
 |----------|--------------------------------------|
 | 요구사항 분석 명세서 | https://docs.google.com/document/d/1IRIgeb5XNz910ra9g0WLj9rM0TVX-vw1BN4duwvAbQM/edit?tab=t.0 |
-| Software Architecture ||
-| Software Design ||
-| UI Design ||
+| Architecture 및 Design Documents |[Software Architecture] - [Software Design] - [UI Design] |
 | Coding Standard | https://docs.google.com/document/d/1OTgrz8aq_iY2XzI8aQ46IBM2eJAir6mhs-IAobRmp84/edit?tab=t.0 |
 | Code ||
 | Test Case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
