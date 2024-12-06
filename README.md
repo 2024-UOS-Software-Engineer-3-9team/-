@@ -45,8 +45,8 @@
 ## Technology Stacks
 | 분야 | Tools |
 |:------:|------|
-| Front-end | Figma, React api |
-| Back-end | Node.js, Express.js |
+| Front-end | Figma , React api |
+| Back-end | Node.js , Express.js |
 | DataBase | SQL developer (ORACLE 기반) |
 
 ## Installation Guideline
