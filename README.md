@@ -30,7 +30,7 @@
 [구현 features]
 |  | 기능 | 설명 | 
 |-|------|--------------|
-|1| Task 기능 | 조별과제에서 각 팀원이 맡은 일을 to do list 형태로 표시한다. Task의 마감일, 담당자가 함께 표시된다.
+|1| Task 기능 | 조별과제에서 각 팀원이 맡은 일을 to do list 형태로 표시한다. Task의 마감일, 담당자가 함께 표시된다. |
 |2| 독촉 기능 | 각 Task 별로 독촉 버튼이 있어 다른 팀원이 독촉 버튼을 누르면 Task 담당자에게 알림이 간다. |
 |3| 회의 시간 맞추기 기능 | 각 팀원이 회의 참여 가능한 시간대를 입력하면 모든 팀원이 가능한 시간대를 계산해준다. |
 
@@ -39,6 +39,7 @@
 ## Project Constraints
 
 ## High Level Architecture
+<img src = "![High_Level_Architecture](https://github.com/user-attachments/assets/509b1a36-2180-44cc-99ad-e6798c76e70f)">
 
 ## Technology Stacks
 | 분야 | Tools |
