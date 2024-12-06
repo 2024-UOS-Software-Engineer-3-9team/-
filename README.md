@@ -69,7 +69,7 @@
 | /README | 본 프로젝트에 대한 모든 description |
 | /proposal/SOW.md | 프로젝트 proposal 내용 |
 | /artifacts ||
-| /reports | - 중간 발표 ppt <br> - 최종 발표 ppt <br> - 데모 비디오 |
+| /reports | - midterm presentation slides <br> - final presentation slides <br> - demo video |
 | /UI, 피그마 | |
 | /front-app | |
 | /backend | |
