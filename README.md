@@ -14,17 +14,17 @@
 2024년 2학기
 <br>
 
-## Project Description
-#### [개발 목적]
+# Project Description
+### [개발 목적]
 - 팀 프로젝트를 진행하다 보면 직무 유기, 시간 조율의 어려움 등 프로젝트의 진행을 방해하는 상황이 발생한다. '일조매'는 업무 분배 및 독촉 기능, 회의 시간 조율 기능 등의 팀플 보조 기능을 제공하여 팀 프로젝트의 순탄한 진행을 돕고자 한다.
 
-#### [사용 대상]
+### [사용 대상]
 - 팀 프로젝트가 필요한 사람들 (ex.개발 동아리, 조별 과제를 하는 대학생들)
 <br>
 
 ## Highlighted Features
 #### [구현 features]
-|  | Feature | 설명 | 
+|  | Feature | Discription | 
 |-|------|--------------|
 |1| Task 기능 | 조별과제에서 각 팀원이 맡은 일을 to do list 형태로 표시한다. Task의 마감일, 담당자가 함께 표시된다. |
 |2| 독촉 기능 | 각 Task 별로 독촉 버튼이 있어 다른 팀원이 독촉 버튼을 누르면 Task 담당자의 핸드폰에 독촉 알림이 간다. |
@@ -65,7 +65,7 @@
 <br>
 
 ## Repository Structure
-| Directory Name | 설명 |
+| Directory Name | Discription |
 |------|------|
 | | |
 |||
