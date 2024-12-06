@@ -68,11 +68,11 @@
 |:--------------:|-------------|
 | /README | all descriptions about this project |
 | /proposal/SOW.md | project proposal |
-| /artifacts | 계속 추가될 것 같아서 완성하면 한번에 작성할게요 |
+| /artifacts | - Coding Standard_너나해.docx <br> - DB_Structure.jpg <br> - High-level Architecture UML Diagrams Document_너나해.docx <br> - README.md <br> - SRS_너나해.docx <br> - SRS-review.docx <br> - UI Design Document_너나해.docx <br> - class_diagram_for_static_view.uxf <br> - figma_flow.png <br> - figma_전체사진.png <br> -sequence_for_usecase_schedule.uxf <br> - sequence_for_usecase_task.uxf <br> - 일조매.fig <br> - 일조매팀 Test Cases.xlsx |
 | /reports | - midterm presentation slides <br> - final presentation slides <br> - demo video |
-| /UI, 피그마 | 계속 추가될 것 같아서 완성하면 한번에 작성할게요 |
-| /front-app | 계속 추가될 것 같아서 완성하면 한번에 작성할게요 |
-| /backend | 계속 추가될 것 같아서 완성하면 한번에 작성할게요 |
+| /UI, 피그마 |  |
+| /front-app |  |
+| /backend |  |
 | /classroom | |
 
 ## Project Team Members
@@ -83,4 +83,4 @@
 | 2020920037 | 유지호 | Back-end | |
 | 2022920001 | 강민지 | Database | |
 | 2022920007 | 김나린 | Database | |
-| 2022920022 | 류수화 | Front-Back 연동 | |
+| 2022920022 | 류수화 | API 개발 | |
