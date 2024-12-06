@@ -16,7 +16,7 @@
 
 # Project Description
 ### [개발 목적]
-- 팀 프로젝트를 진행하다 보면 직무 유기, 시간 조율의 어려움 등 프로젝트의 진행을 방해하는 상황이 발생한다. '일조매'는 업무 분배 및 독촉 기능, 회의 시간 조율 기능 등의 팀플 보조 기능을 제공하여 팀 프로젝트의 순탄한 진행을 돕고자 한다.
+- 팀 프로젝트를 진행하다 보면 직무 유기, 시간 조율의 어려움 등 프로젝트의 진행을 방해하는 상황이 발생한다. <일조매>는 업무 분배 및 독촉 기능, 회의 시간 조율 기능 등의 팀 프로젝트 보조 기능을 제공하여 팀 프로젝트의 순탄한 진행을 돕고자 한다.
 
 ### [사용 대상]
 - 팀 프로젝트가 필요한 사람들 (ex.개발 동아리, 조별 과제를 하는 대학생들)
@@ -56,8 +56,8 @@
 | Document | Link |
 |----------|-------|
 | 요구사항 분석 명세서 | https://docs.google.com/document/d/1IRIgeb5XNz910ra9g0WLj9rM0TVX-vw1BN4duwvAbQM/edit?tab=t.0 |
-| Software Architecture | |
-| Software Design | |
+| Software Architecture | 추가 예정 |
+| Software Design | 추가 예정 |
 | UI Design | https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/blob/main/UI%2C%ED%94%BC%EA%B7%B8%EB%A7%88/%EC%9D%BC%EC%A1%B0%EB%A7%A4_UI%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%84%B8%EB%B6%80%20%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7.png |
 | Coding Standard | https://docs.google.com/document/d/1OTgrz8aq_iY2동 |
 | Code | 추가 예정 | 
@@ -70,7 +70,7 @@
 | /proposal/SOW.md | project proposal |
 | /artifacts | **[Requirements]** <br> - SRS_너나해.docx *최신 버전으로 업데이트해야 함 <br> - SRS-review.docx <br><br> **[High-level Architecture]** <br> - High-level Architecture UML Diagrams Document_너나해.docx <br><br> **[UML Design]** <br> - class_diagram_for_static_view.uxf <br> - sequence_for_usecase_task.uxf <br> - sequence_for_usecase_schedule.uxf <br><br> **[UI Design]** <br> - UI Design Document_너나해.docx <br> - figma_전체사진.png <br> - figma_flow.png <br> - 일조매.fig <br><br> **[Coding Standard]** <br> - Coding Standard_너나해.docx <br><br> **[Test Case]** <br> - 일조매팀 Test Cases.xlsx |
 | /reports | - midterm presentation slides <br> - final presentation slides <br> - demo video |
-| /UI, 피그마 | UI design 스크린샷 및 figma code |
+| /UI, 피그마 | UI design 스크린샷 및 figma codes |
 | /front-app | - react native code <br> - 설정 파일 <br> - font <br> - icons |
 | /backend | bakc-end api |
 | /database | database 구조 |
