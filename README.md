@@ -64,12 +64,17 @@
 | Test case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
 
 ## Repository Structure
-| Directory Name | Description |
+| Directory Name | Contents |
 |:--------------:|-------------|
-| /README ||
-| /proposal/SOW.md ||
+| /README | 본 프로젝트에 대한 모든 description |
+| /proposal/SOW.md | 프로젝트 proposal 내용 |
 | /artifacts ||
-| /reports | - 중간 발표 <br> - 최종 발표 <br> - 데모 비디오|
+| /reports | - 중간 발표 ppt <br> - 최종 발표 ppt <br> - 데모 비디오 |
+| /UI, 피그마 | |
+| /front-app | |
+| /backend | |
+| presentation | - 중간 발표 ppt |
+| /classroom | |
 
 ## Project Team Members
 | Student Number | Name | Role | etc |
