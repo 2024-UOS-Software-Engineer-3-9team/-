@@ -64,9 +64,10 @@
 ## Repository Structure
 | Directory Name | Discription |
 |:--------------:|-------------|
-|||
-|||
-|||
+| /README||
+| /proposal/SOW.md ||
+| /artifacts ||
+| /reports | |
 
 ## Project Team Members
 | Student Number | Name | Role | etc |
