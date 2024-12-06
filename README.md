@@ -40,9 +40,9 @@
 ## High Level Architecture
 
 ## Technology Stacks
-| | |
-|-----|-----|
-| Front-end | |
+| 분야 | Tools |
+|------|------|
+| Front-end | React |
 | Back_end | |
 | DataBase | SQL developer (ORACLE 기반) |
 
