@@ -7,7 +7,7 @@
 <br>
 
 ## Project Scope
-서울시립대학교 컴퓨터과학부 2024년 소프트웨어공학 프로젝트로, Software Development Life-Cycle을 기반으로 객체지향 소프트웨어 공학 방법론을 적용하여 팀플 도우미 앱 <일조매> 개발
+서울시립대학교 컴퓨터과학부 2024년 소프트웨어공학 프로젝트로, Software Development Life-Cycle을 기반으로 객체지향 소프트웨어 공학 방법론을 적용하여 팀 프로젝트 진행 보조 애플리케이션 <일조매> 개발
 <br>
 
 ## Project Duration
