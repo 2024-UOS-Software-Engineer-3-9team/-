@@ -58,7 +58,7 @@
 | 요구사항 분석 명세서 | https://docs.google.com/document/d/1IRIgeb5XNz910ra9g0WLj9rM0TVX-vw1BN4duwvAbQM/edit?tab=t.0 |
 | Software architecture | |
 | Software Design | |
-| UI Design | |
+| UI Design | https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/blob/main/UI%2C%ED%94%BC%EA%B7%B8%EB%A7%88/%EC%9D%BC%EC%A1%B0%EB%A7%A4_UI%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%84%B8%EB%B6%80%20%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7.png |
 | Coding Standard | https://docs.google.com/document/d/1OTgrz8aq_iY2XzI8aQ46IBM2eJAir6mhs-IAobRmp84/edit?tab=t.0 |
 | Code | 추가 예정 |
 | Test Case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
