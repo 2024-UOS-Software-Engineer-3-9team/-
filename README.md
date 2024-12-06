@@ -56,7 +56,9 @@
 | Document | Link |
 |----------|--------------------------------------|
 | 요구사항 분석 명세서 | https://docs.google.com/document/d/1IRIgeb5XNz910ra9g0WLj9rM0TVX-vw1BN4duwvAbQM/edit?tab=t.0 |
-| Architecture 및 Design Documents | |
+| Software architecture | |
+| Software Design | |
+| UI Design | |
 | Coding Standard | https://docs.google.com/document/d/1OTgrz8aq_iY2XzI8aQ46IBM2eJAir6mhs-IAobRmp84/edit?tab=t.0 |
 | Code | 추가 예정 |
 | Test Case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
@@ -72,7 +74,7 @@
 <br>
 
 ## Project Team Members
-|  학번  | 이름 | role | 비고 |
+|  학번  | 이름 | Role | 비고 |
 |-----------|-------|:--------:|----|
 |2020920002 | 구효근 | Front-end | 조장 |
 |2020920019 | 문윤서 | Front-end | |
