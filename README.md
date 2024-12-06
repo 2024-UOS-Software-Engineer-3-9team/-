@@ -44,7 +44,7 @@
 | 분야 | Tools |
 |:------:|------|
 | Front-end | React |
-| Back_end | |
+| Back_end | Node js |
 | DataBase | SQL developer (ORACLE 기반) |
 
 ## Installation Guideline
@@ -64,6 +64,7 @@
 | Name | |
 |------|------|
 | | |
+|-|-|-|
 ||||
 |||
 
