@@ -39,7 +39,8 @@
 <br>
 
 ## Project Constraints
-- 본 프로젝트는 한 학기 내에 개발되어야 하므로, 
+- 시간적 제약: 본 프로젝트는 한 학기 내에 개발되어야 한다.
+- 
 <br>
 
 ## Project Team Members
