@@ -25,7 +25,7 @@
 ## Highlighted Features
 #### [구현 features]
 |  | Feature | Discription | 
-|-|------|--------------|
+|-|:------:|--------------|
 |1| Task 기능 | 조별과제에서 각 팀원이 맡은 일을 to do list 형태로 표시한다. Task의 마감일, 담당자가 함께 표시된다. |
 |2| 독촉 기능 | 각 Task 별로 독촉 버튼이 있어 다른 팀원이 독촉 버튼을 누르면 Task 담당자의 핸드폰에 독촉 알림이 간다. |
 |3| 회의 시간 조율 기능 | 각 팀원이 회의 참여 가능한 시간대를 입력하면 모든 팀원이 가능한 시간대를 계산해준다. |
@@ -69,7 +69,7 @@
 |||
 
 ## Project Team Members
-| Student Number | Name | Role | 비고 |
+| Student Number | Name | Role | etc |
 |:--------------:|------|:----:|------|
 | 2020920002 | 구효근 | Front-end | 조장 |
 | 2020920019 | 문윤서 | Front-end | |
