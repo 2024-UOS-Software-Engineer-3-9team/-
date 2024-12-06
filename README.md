@@ -48,7 +48,7 @@
 | 분야 | Tools |
 |:------:|------|
 | Front-end | Figma, React api |
-| Back_end | Node js |
+| Back-end | Node js |
 | DataBase | SQL developer (ORACLE 기반) |
 
 ## Installation Guideline
