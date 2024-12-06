@@ -68,11 +68,12 @@
 |:--------------:|-------------|
 | /README | all descriptions about this project |
 | /proposal/SOW.md | project proposal |
-| /artifacts | **[requirements]** <br> - SRS_너나해.docx <br> - SRS-review.docx <br> **[high-level architecture]** <br> - High-level Architecture UML Diagrams Document_너나해.docx <br> **[uml design]** <br> - class_diagram_for_static_view.uxf <br> - sequence_for_usecase_task.uxf <br> - sequence_for_usecase_schedule.uxf <br> **[UI design]** <br> - UI Design Document_너나해.docx <br> - figma_전체사진.png <br> - figma_flow.png <br> - 일조매.fig <br> **[Coding Standard]** <br> - Coding Standard_너나해.docx <br> **[Test Case]** <br> - 일조매팀 Test Cases.xlsx |
+| /artifacts | **[Requirements]** <br> - SRS_너나해.docx '최신 버전으로 업데이트해야 함' <br> - SRS-review.docx <br><br> **[High-level Architecture]** <br> - High-level Architecture UML Diagrams Document_너나해.docx <br><br> **[UML Design]** <br> - class_diagram_for_static_view.uxf <br> - sequence_for_usecase_task.uxf <br> - sequence_for_usecase_schedule.uxf <br><br> **[UI Design]** <br> - UI Design Document_너나해.docx <br> - figma_전체사진.png <br> - figma_flow.png <br> - 일조매.fig <br><br> **[Coding Standard]** <br> - Coding Standard_너나해.docx <br> **[Test Case]** <br> - 일조매팀 Test Cases.xlsx |
 | /reports | - midterm presentation slides <br> - final presentation slides <br> - demo video |
 | /UI, 피그마 | UI design 스크린샷 및 figma code |
-| /front-app | front-end 개발 code |
-| /backend | bakc-end 개발 code |
+| /front-app | - react native code <br> - 설정 파일 <br> - font <br> - icons |
+| /backend | bakc-end api |
+| /database | database 구조 |
 | /classroom | 수업시간에 사용한 문서들 |
 
 ## Project Team Members
