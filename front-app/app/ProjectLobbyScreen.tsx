@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import {
+  Avatar,
+  Box,
+  Button,
+  Container,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 interface ProjectLobbyScreenProps {
   projectId: string;
   onBackPress: () => void;
   onAlarmPress: () => void;
   onAddMemberPress: () => void;
+  onCalenderPress: () => void;
   onSchedulePress: () => void;
 }
 
@@ -15,10 +26,12 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   onBackPress,
   onAlarmPress,
   onAddMemberPress,
+  onCalenderPress,
   onSchedulePress,
 }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [projectData, setProjectData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"캘린더" | "구성원" | "스케쥴">("구성원");
   // AsyncStorage에서 토큰 가져오기
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -38,7 +51,6 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     fetchAccessToken();
   }, []);
   
-  const [activeTab, setActiveTab] = useState<"구성원" | "스케줄">("구성원");
 
   const participants = [
     { id: "1", name: "구준표" },
@@ -92,101 +104,235 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   }, [accessToken, projectId]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBackPress}>
-          <Text style={styles.backButton}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>일조매 개발</Text>
-        <TouchableOpacity onPress={onAlarmPress}>
-          <Text style={styles.alarmButton}>🔔</Text>
-        </TouchableOpacity>
-      </View>
-      {activeTab === "구성원" && (
-        <FlatList
-          data={projectData}
-          renderItem={({ item }) => (
-            <View style={styles.participantCard}>
-              <Text style={styles.cardTitle}>{item.name}</Text>
-              <TouchableOpacity style={styles.cardButton}>
-                <Text style={styles.cardButtonText}>독촉하기</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-        />
-      )}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.footerButton, activeTab === "구성원" && styles.activeButton]}
-          onPress={() => setActiveTab("구성원")}
-        >
-          <Text style={styles.footerButtonText}>구성원</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.footerButton, activeTab === "스케줄" && styles.activeButton]}
-          onPress={() => {
-            setActiveTab("스케줄");
-            onSchedulePress();
+    <Box                        //전체 파란색 배경
+      sx={{
+        backgroundColor: "#4d9cff",
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      <Box                  // Java Jpanel같은 느낌으로 바깥 부분.
+        sx={{
+          backgroundColor: "#4d9cff",
+          overflow: "hidden",
+          width: 360,
+          height: 800,
+          position: "absolute",
+        }}
+      >
+          <Typography       //프로젝트 이름
+            variant="h3"
+            sx={{
+              position: "relative",
+              top: 30,
+              left: 10,
+              zIndex: 10,
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            일조매 개발
+          </Typography>
+      </Box>
+    <Container
+        sx={{
+          backgroundColor: "#4d9cff",
+          width: 360,
+          height: 800,
+          position: "relative",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            width: 312,
+            height: 621,
+            top: 102,
+            left: 10,
+            backgroundColor: "white",
+            padding: 2,
           }}
         >
-          <Text style={styles.footerButtonText}>스케줄</Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity style={styles.addButton} onPress={onAddMemberPress}>
-        <Text style={styles.addButtonText}>+</Text>
-      </TouchableOpacity>
-    </View>
+          <Typography 
+          variant="h4" fontWeight="bold" sx={{ mb: 2 }}>
+            구성원
+          </Typography>
+
+          <Box
+            sx={{
+              height: 500,
+              overflowY: "scroll",
+              mb: 2,
+            }}
+          >
+            <List>
+              {[
+                {
+                  name: "구효근 (팀장)",
+                  role: "UI, React API",
+                  tasks: [
+                    "과제 제출 준비하기 (~11/18)",
+                    "Class Diagrams for static view (~11/17)",
+                  ],
+                  avatar: "ellipse25",
+                  buttonText: "나",
+                },
+                {
+                  name: "문윤서",
+                  role: "UI, React API",
+                  tasks: [
+                    "UI 종이에 그려서 피드백 받기 (~11/17) (완료)",
+                    "UI 피그마로 만들기 (~11/18)",
+                  ],
+                  avatar: "ellipse24",
+                  buttonText: "독촉",
+                },
+                {
+                  name: "문윤서",
+                  role: "UI, React API",
+                  tasks: [
+                    "UI 종이에 그려서 피드백 받기 (~11/17) (완료)",
+                    "UI 피그마로 만들기 (~11/18)",
+                  ],
+                  avatar: "ellipse24",
+                  buttonText: "독촉",
+                },
+                // Add other members here
+              ].map((member, index) => (
+                <ListItem
+                  key={index}
+                  sx={{
+                    backgroundColor: "#7b7a7a",
+                    borderRadius: 1,
+                    mb: 2,
+                    padding: 2,
+                  }}
+                >
+                  <ListItemAvatar>
+                    <Avatar src={member.avatar} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        color="white"
+                      >
+                        {member.name}
+                        <br />
+                        {member.role}
+                      </Typography>
+                    }
+                    secondary={
+                      <Box sx={{ mt: 1 }}>
+                        {member.tasks.map((task, idx) => (
+                          <Typography
+                            key={idx}
+                            variant="body2"
+                            fontWeight="bold"
+                            color="black"
+                          >
+                            {task}
+                          </Typography>
+                        ))}
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: "#4d9cff",
+                            borderRadius: 1,
+                            mt: 1,
+                          }}
+                        >
+                          {member.buttonText}
+                        </Button>
+                      </Box>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: "#4d9cff", borderRadius: 1 }}
+              onClick={() => {
+                onAddMemberPress();}
+              }
+            >
+              구성원 추가
+            </Button>
+          </Box>
+        </Box>
+       
+        <Box     //하단 바 완성
+          sx={{
+            position: 'absolute',
+            width: 361,
+            height: 36,
+            top: 765,
+            left: 0,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '캘린더' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}
+            onClick={() => {
+              setActiveTab('캘린더');
+              onCalenderPress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '캘린더' ? 'white' : 'black', fontWeight: 'bold' }}>
+              캘린더
+            </Typography>
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '구성원' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}            
+            onClick={() => {}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '구성원' ? 'white' : 'black', fontWeight: 'bold' }}>
+              구성원
+            </Typography>
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '스케쥴' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}
+            onClick={() => {
+              setActiveTab('스케쥴');
+              onSchedulePress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '스케쥴' ? 'white' : 'black', fontWeight: 'bold' }}>
+              스케쥴
+            </Typography>
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#4A90E2" },
-  header: { flexDirection: "row", justifyContent: "space-between", padding: 16 },
-  backButton: { color: "#FFFFFF", fontSize: 20 },
-  headerTitle: { color: "#FFFFFF", fontSize: 18, fontWeight: "bold" },
-  alarmButton: { color: "#FFFFFF", fontSize: 20 },
-  list: { paddingBottom: 80 },
-  participantCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    padding: 16,
-    marginHorizontal: 16,
-    marginBottom: 8,
-  },
-  cardTitle: { fontSize: 16, fontWeight: "bold" },
-  cardRole: { fontSize: 12, color: "#555" },
-  cardTask: { fontSize: 12, marginTop: 4 },
-  cardButton: {
-    marginTop: 8,
-    backgroundColor: "#0066FF",
-    padding: 8,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  cardButtonText: { color: "#FFFFFF", fontSize: 12 },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 12,
-  },
-  footerButton: { flex: 1, alignItems: "center", paddingVertical: 8 },
-  activeButton: { backgroundColor: "#003C8F" },
-  footerButtonText: { color: "#FFFFFF", fontSize: 14 },
-  addButton: {
-    position: "absolute",
-    bottom: 16,
-    right: 16,
-    backgroundColor: "#FFFFFF",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addButtonText: { fontSize: 24, color: "#4A90E2" },
-});
+
 
 export default ProjectLobbyScreen;
