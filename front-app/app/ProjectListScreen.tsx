@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage 임포트
+import { useProject } from './context/ProjectContext';
 
 interface Project {
   PROJ_ID: string;
@@ -23,14 +24,15 @@ const ProjectListScreen: React.FC<ProjectListScreenProps> = ({
 }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [accessToken, setToken] = useState<string | null>(null); // 토큰 상태
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const { projectId, leader, setProjectId, setLeader } = useProject();
 
   // AsyncStorage에서 토큰을 가져오는 함수
   const fetchToken = async () => {
     try {
       const storedToken = await AsyncStorage.getItem("accessToken"); // "token" 키로 저장된 토큰을 가져옴
       if (storedToken) {
-        setToken(storedToken); // 가져온 토큰을 상태에 저장
+        setAccessToken(storedToken); // 가져온 토큰을 상태에 저장
       }
     } catch (error) {
       console.error("토큰을 가져오는 중 오류 발생:", error);
@@ -99,7 +101,12 @@ const ProjectListScreen: React.FC<ProjectListScreenProps> = ({
       <View style={styles.cardHeader}>
         <Text style={styles.cardTitle}>{item.PROJ_NAME}</Text>
       </View>
-      <TouchableOpacity style={styles.cardButton} onPress={() => onProjectPress(item.PROJ_ID)}>
+      <TouchableOpacity style={styles.cardButton} onPress={() => {
+          console.log(item.PROJ_ID);
+          setProjectId(item.PROJ_ID);
+          setLeader(item.LEADER_ID);
+          onProjectPress(item.PROJ_ID);
+        }}>
         <Text style={styles.cardButtonText}>바로가기</Text>
       </TouchableOpacity>
     </View>
