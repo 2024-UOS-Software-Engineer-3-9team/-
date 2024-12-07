@@ -12,6 +12,7 @@ interface CalenderLobbyScreenProps {
   onProjectLobbyPress: () => void;
   onSchedulePress: () => void;
   onGenerateTaskPress: () => void;
+  onDateCellClick: (date: number, event: React.MouseEvent) => void;
 }
 
 
@@ -19,10 +20,24 @@ const CalenderLobbyScreen: React.FC<CalenderLobbyScreenProps> = ({
   onCalenderPress,
   onProjectLobbyPress,
   onSchedulePress,
-  onGenerateTaskPress
+  onGenerateTaskPress,
+  onDateCellClick,
 }) => {
+  const [clickedDate, setClickedDate] = useState(null);
+  const OndateCellClick = (date, event) => {
+    setClickedDate(date); // 클릭한 날짜 상태 업데이트
+    console.log(`날짜: ${date}, 클릭 이벤트: `, event); // 클릭한 날짜와 이벤트 정보 출력
+  };
 
   const [activeTab, setActiveTab] = useState<"캘린더" | "구성원" | "스케쥴">("캘린더");
+
+    // 날짜 클릭 시 호출되는 함수
+    const handleCellClick = (date: number, event: React.MouseEvent) => {
+      setClickedDate(date); // 클릭한 날짜 상태 업데이트
+      console.log(`날짜: ${date}, 클릭 이벤트: `, event); // 클릭된 날짜와 이벤트 정보 출력
+      onDateCellClick(date, event); // 부모에게 클릭한 날짜 전달
+    };
+    
   return (
     <Box                        //전체 파란색 배경
       sx={{
@@ -38,6 +53,7 @@ const CalenderLobbyScreen: React.FC<CalenderLobbyScreenProps> = ({
           overflow: "hidden",
           width: 360,
           height: 800,
+          left : 130,
           position: "relative",
         }}
       >
@@ -86,7 +102,7 @@ const CalenderLobbyScreen: React.FC<CalenderLobbyScreenProps> = ({
               color: "black",
             }}
           >
-            11월 14일
+            11월 3째주
           </Typography>
           <IconButton
             sx={{
@@ -422,40 +438,66 @@ const CalenderLobbyScreen: React.FC<CalenderLobbyScreenProps> = ({
           </Button>
         </Box>
       </Box>
-      <Table sx={{ position: "absolute",width: '30%', tableLayout: 'fixed', border: '1px solid black',top: 150, left: 325,}}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: '10%', border: '1px solid black',padding: '1.5px', }}>날짜</TableCell> {/* 날짜 헤더*/}
-                <TableCell sx={{ width: '90%', border: '1px solid black',padding: '1.5px',}}>Task 내용</TableCell> {/* Task 내용 헤더 */}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {/* 해당 부분 수정하여 Task 내용 및 날짜 넣어야 함 */}
-              {[...Array(7)].map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell
-                    sx={{
-                      width: '10%',
-                      border: '1px solid black',
-                      padding: '2px',  // 셀의 세로 길이를 작게 설정
-                    }}
-                  >
-                    {/* (2,1)부터 (8,1)까지 날짜 표시 */}
-                    {index}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      border: '1px solid black',
-                      padding: '2px',  // 셀의 세로 길이를 작게 설정
-                    }}
-                  >
-                    {/* 각 Task 내용 */}
-                    {index === 0 ? '' : `Task 내용 ${index}`} 
-                  </TableCell>
+      <Box     //하단 바 완성
+          sx={{
+            position: 'relative',
+            width: 300,
+            height: 230,
+            top: 130,
+            left: -200,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+          >
+        <Table sx={{ 
+          position: "relative",
+          width: '100%', 
+          height: '100%', 
+          tableLayout: 'fixed', 
+          border: '1px solid black',
+          top: 0, 
+          left: 0,
+          zIndex: 10,
+          overflow: 'auto', 
+          }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ width: '10%', border: '1px solid black',padding: '1.5px', }}>날짜</TableCell> {/* 날짜 헤더*/}
+                  <TableCell sx={{ width: '90%', border: '1px solid black',padding: '1.5px',}}>Task 내용</TableCell> {/* Task 내용 헤더 */}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {/* 해당 부분 수정하여 Task 내용 및 날짜 넣어야 함 */}
+                {[...Array(7)].map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell
+                      sx={{
+                        width: '10%',
+                        border: '1px solid black',
+                        padding: '2px',  // 셀의 세로 길이를 작게 설정
+                        cursor: 'pointer', 
+                        '&:hover': {
+                          fontWeight: 'bold', 
+                        },
+                      }}
+                      onClick={(event) => OndateCellClick(index + 1, event)} // 클릭 시 날짜와 이벤트 넘기기
+                    >
+                      {index + 1} {/* 날짜 표시 */}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        border: '1px solid black',
+                        padding: '2px',  // 셀의 세로 길이를 작게 설정
+                      }}
+                    >
+                      {/* 각 Task 내용 */}
+                      {index === 0 ? '' : `Task 내용 ${index}`} 
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
     </Box>
   );
 };
