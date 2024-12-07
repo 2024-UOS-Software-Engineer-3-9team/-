@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useProject } from './context/ProjectContext';
 
 interface InsertSchedulePopupProps {
   onClose: () => void; // 팝업 닫기 콜백
@@ -17,10 +18,15 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
   const days = ["11/4", "11/5", "11/6", "11/7", "11/8", "11/9", "11/10"];
   const times = [...Array(24)].map((_, i) => `${i}:00`);
   const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
+  const { projectId, leader, setProjectId, setLeader } = useProject();
 
   // 팝업이 열릴 때 초기 상태 설정
   useEffect(() => {
     setSelectedCells(new Set(initialSelectedCells));
+    if(selectedCells)
+    {
+      setSelectedCells(selectedCells);
+    }
   }, [initialSelectedCells]);
 
   const toggleCell = (cellKey: string) => {
@@ -76,35 +82,40 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
   };
 
   const handleConfirm = async () => {
-    try {
-      const binarySchedule = generateScheduleBinary(selectedCells);
+    const data_meets = ['02', '03', '04', '05', '06', '07', '08'];
+    const binarySchedule = generateScheduleBinary(selectedCells);
+    for(let i=0; i<7; i++)
+    {
+      try {
+        const response = await fetch(
+          `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/addschedule`, 
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              time: binarySchedule[i],
+              date_meet: `2024-12-${data_meets[i]}`,
+            }),
+          }
+        );
 
-      console.log(binarySchedule);
-      const response = await fetch("ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/addschedule", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          time: binarySchedule[0],
-          data_meet: "2024-12-05",
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        Alert.alert("성공", "스케줄이 저장되었습니다.");
-        
-      } else {
-        const errorData = await response.json();
-        Alert.alert("오류", errorData.message || "스케줄 저장에 실패했습니다.");
+        if (response.ok) {
+          const result = await response.json();
+          Alert.alert("성공", "스케줄이 저장되었습니다.");
+          
+        } else {
+          const errorData = await response.json();
+          Alert.alert("오류", errorData.message || "스케줄 저장에 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("API 요청 오류:", error);
+        Alert.alert("에러", "스케줄 저장 중 네트워크 오류가 발생했습니다.");
+      } finally {
+        onConfirm(selectedCells); // 상태 전달 및 팝업 닫기
       }
-    } catch (error) {
-      console.error("API 요청 오류:", error);
-      Alert.alert("에러", "스케줄 저장 중 네트워크 오류가 발생했습니다.");
-    } finally {
-      onConfirm(selectedCells); // 상태 전달 및 팝업 닫기
     }
   };
 
@@ -115,7 +126,7 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
           <Text style={styles.popupTitle}>2024.11</Text>
 
           {/* 시간표 */}
-          <View style={styles.table}>
+          <ScrollView style={styles.table}>
             <View style={styles.row}>
               <Text style={styles.headerCell}></Text>
               {days.map((day, index) => (
@@ -140,14 +151,14 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
                 })}
               </View>
             ))}
-          </View>
+          </ScrollView>
 
-            {/* 버튼 */}
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={handleConfirm} // 선택된 상태 전달
-              >
+          {/* 버튼 */}
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handleConfirm} // 선택된 상태 전달
+            >
               <Text style={styles.buttonText}>확인</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
@@ -169,9 +180,11 @@ const styles = StyleSheet.create({
   },
   popupContent: {
     width: "90%",
+    height: "90%", // 화면 크기를 90%로 제한
     backgroundColor: "#FFFFFF",
     borderRadius: 8,
     padding: 16,
+    flexDirection: "column", // 세로 방향으로 배치
   },
   popupTitle: {
     textAlign: "center",
@@ -180,6 +193,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   table: {
+    flex: 1, // 테이블을 스크롤할 수 있도록 만듦
     marginBottom: 16,
   },
   row: {
