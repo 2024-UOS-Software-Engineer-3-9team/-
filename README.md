@@ -36,6 +36,11 @@
 <br>
 
 ## Project Constraints
+- 본 프로젝트는 한 학기 내에 완료되어야 한다. 12/10(화) 최종 발표에 맞춰, 12/8(일)까지 모든 개발 및 테스트가 완료되었다.
+- '일조매'는 크로스 플랫폼으로 개발되었다. 즉, 웹 브라우저와 모바일 앱을 모두 지원한다.
+- 웹과 앱의 효율적인 연동을 위해 프론트엔드는 자바스크립트를 기반으로 한 React와 React Native를 사용하여 구현하였다. 백엔드는 React와의 호환성을 고려해 RESTful API를 지원하는 Node.js를 채택하였다. 데이터베이스는 Oracle을 기반으로 하며, SQL Developer를 사용하여 관리한다.
+- 모든 구현은 가상 서버 환경에서 이루어졌으며, Amazon Web Services(AWS)의 EC2 인스턴스를 이용해 가상 서버를 운영한다.
+- '팀원끼리 시간 맞추는 기능'의 경우, 팀원이 입력할 수 있는 가능한 시간대는 1시간 단위로 한다.
 <br>
 
 ## High Level Architecture
@@ -45,7 +50,7 @@
 ## Technology Stacks
 | Field | Tools |
 |:------:|:----:|
-| Front-end | Figma / React api |
+| Front-end | Figma / React / React Native |
 | Back-end | Node.js / Express.js |
 | DataBase | SQL developer (ORACLE 기반) |
 
