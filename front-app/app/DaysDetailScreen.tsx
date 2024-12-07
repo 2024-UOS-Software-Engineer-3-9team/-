@@ -1,538 +1,256 @@
-import { CheckBoxIcon } from "./icons/CheckBoxIcon"; // CheckBoxIcon import
-import { ArrowBackIcon } from "./icons/ArrowBackIcon"; // ArrowBackIcon import
-import { ArrowForwardIcon } from "./icons/ArrowForwardIcon"; // ArrowForwardIcon import
-import { CalendarTodayIcon } from "./icons/CalendarTodayIcon"; // CalendarTodayIcon import
-import { CheckBoxOutlineBlankIcon } from "./icons/CheckBoxOutlineBlankIcon"; // CheckBoxOutlineBlankIcon import
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Modal } from "react-native";
+import { format } from "date-fns";
+import { useNavigation } from '@react-navigation/native'; // 네비게이션 훅 사용
 
-import { Box, Button, Checkbox, IconButton, Typography } from "@mui/material";
-import React, { useState, useEffect } from "react";
-import { TouchableOpacity } from 'react-native';
-
-interface DaysDetailScreenProps {
-  onCalenderPress: () => void;
-  onProjectLobbyPress: () => void;
-  onSchedulePress: () => void;
-  onGenerateTaskPress: () => void;
+interface Task {
+  id: string;
+  title: string;
+  assignees: string[];
+  status: "ongoing" | "completed";
 }
 
-const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ 
-  onCalenderPress,
-  onProjectLobbyPress,
-  onSchedulePress,
-  onGenerateTaskPress,
-}) => {
+const GenerateTaskScreen: React.FC<{
+  visible: boolean;
+  onClose: () => void;
+  onSave: (task: { deadline: string; assignees: string[] }) => void;
+}> = ({ visible, onClose, onSave }) => {
+  const [deadline, setDeadline] = useState("");
+  const [assignees, setAssignees] = useState<string[]>([]);
 
-  const [activeTab, setActiveTab] = useState<"캘린더" | "구성원" | "스케쥴">("캘린더");
+  const handleSave = () => {
+    onSave({ deadline, assignees });
+  };
+
   return (
-    <Box                        //전체 컨테이너
-      sx={{
-        backgroundColor: "#4d9cff",
-        display: "flex",
-        justifyContent: "center",
-        width: "100%",
-      }}
-    >
-      <Box                  // Java Jpanel같은 느낌으로 바깥 부분.
-        sx={{
-          backgroundColor: "#4d9cff",
-          overflow: "hidden",
-          width: 360,
-          height: 800,
-          position: "relative",
-        }}
-      >
-          <Typography       //프로젝트 이름
-            variant="h3"
-            sx={{
-              position: "absolute",
-              top: 51,
-              left: 24,
-              color: "white",
-              fontWeight: "bold",
-            }}
-          >
-            일조매 개발
-          </Typography>
-        <Box           //여기가 흰색 배경임
-          sx={{
-            position: "absolute",
-            width: 312,
-            height: 777,
-            top: 124,
-            left: 24,
-          }}
-        >
-          <Box       //Ongoing 배치 구역
-            sx={{
-              position: "absolute",
-              width: 312,
-              height: 621,
-              top: 0,
-              left: 0,
-              backgroundColor: "white",
-            }}
-          />
-
-          <Box        //Ongoing 텍스트배치 구역
-            sx={{
-              position: "absolute",
-              width: 312,
-              height: 634,
-              top: 143,
-              left: 0,
-            }}
-          >
-            <Box    //Ongoing 텍스트배치 관련
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                width: 312,
-                alignItems: "start",
-                gap: 1,
-                position: "absolute",
-                top: 0,
-                left: 0,
-              }}
-            >
-              <Box    //Ongoing 텍스트배치 관련
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2.5,
-                  px: 2.5,
-                  py: 0,
-                  width: "100%",
-                }}
-              >
-                <CalendarTodayIcon sx={{ width: 26, height: 26 }} />
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: "bold", color: "black" }}
-                >
-                  OnGoing
-                </Typography>
-              </Box>
-
-              <Box     // Ongoing의 각 멤버 정보 관련 저장한 박스
-                sx={{ display: "flex", flexDirection: "column", width: "100%" }}
-              >
-                <Box        //사람, 체크박스, 독촉하기 버튼 그룹 1
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      px: 2.5,
-                      py: 0,
-                      width: "90%",
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{ fontWeight: "bold", color: "black" }}
-                    >
-                      유지호
-                    </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Checkbox
-                      icon={<CheckBoxOutlineBlankIcon />}
-                      checkedIcon={<CheckBoxIcon />}
-                    />
-                    <Button
-                      variant="contained"
-                      sx={{
-                        backgroundColor: "black",
-                        color: "white",
-                        fontSize: 10,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      독촉하기
-                    </Button>
-                </Box>
-                <Box      //사람, 체크박스, 독촉하기 버튼 그룹 2
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    px: 2.5,
-                    py: 0,
-                    width: "90%",
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    sx={{ fontWeight: "bold", color: "black" }}
-                  >
-                    구효근
-                  </Typography>
-                  <Box sx={{ flexGrow: 1 }} />
-                  <Checkbox
-                    icon={<CheckBoxOutlineBlankIcon />}
-                    checkedIcon={<CheckBoxIcon />}
-                  />
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: "black",
-                      color: "white",
-                      fontSize: 10,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    독촉하기
-                  </Button>
-                </Box>
-                <Box      //사람, 체크박스, 독촉하기 버튼 그룹 3
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    px: 2.5,
-                    py: 0,
-                    width: "90%",
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    sx={{ fontWeight: "bold", color: "black" }}
-                  >
-                    김나린
-                  </Typography>
-                  <Box sx={{ flexGrow: 1 }} />
-                  <Checkbox
-                    icon={<CheckBoxOutlineBlankIcon />}
-                    checkedIcon={<CheckBoxIcon />}
-                  />
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: "black",
-                      color: "white",
-                      fontSize: 10,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    독촉하기
-                  </Button>
-                </Box>
-              </Box>
-            </Box>
-
-            <Box   //Completed Text 구역
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                width: 312,
-                alignItems: "start",
-                gap: 1,
-                position: "absolute",
-                top: 248,
-                left: 0,
-              }}
-            >
-              <Box // Completed text 표기용
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2.5,
-                  px: 2.5,
-                  py: 0,
-                  width: "100%",
-                }}
-              >
-                <CalendarTodayIcon sx={{ width: 26, height: 26 }} />
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: "bold", color: "black" }}
-                >
-                  Completed
-                </Typography>
-              </Box>
-
-              <Box  // Completed 세부 항목
-                sx={{ display: "flex", flexDirection: "column", width: "100%" }}
-              >
-                <Box  //세부 항목이 들어가는 박스 
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    width: "100%",
-                  }}
-                >
-                  <Box   //세부 항목 1
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2.5,
-                      px: 2.5,
-                      py: 0,
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "black",
-                        textDecoration: "line-through",
-                      }}
-                    >
-                      미팅 잡기
-                    </Typography>
-                  </Box>
-
-                  <Box    //세부 항목 2
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      px: 2.5,
-                      py: 0,
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "black",
-                        textDecoration: "line-through",
-                      }}
-                    >
-                      유지호
-                    </Typography>
-                  </Box>
-
-                  <Box    //세부 항목 3
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      px: 2.5,
-                      py: 0,
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "black",
-                        textDecoration: "line-through",
-                      }}
-                    >
-                      유지호
-                    </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
-                  </Box>
-
-                  <Box    //세부 항목 4
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      px: 2.5,
-                      py: 0,
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "black",
-                        textDecoration: "line-through",
-                      }}
-                    >
-                      유지호
-                    </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
-                  </Box>
-                  <Box sx={{ flexGrow: 1 }} //기타 세팅
-                  /> 
-                  </Box>
-                </Box>
-            </Box>
-          </Box>
-        </Box>
-        <Box              //상단 날짜 이동 구역 (양 버튼과 날짜)
-          sx={{ position: "absolute", width: 278, height: 29, top: 140, left: 40 }}
-        >
-          <Typography
-            variant="h4"
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 55,
-              fontWeight: "bold",
-              color: "black",
-            }}
-          >
-            11월 14일
-          </Typography>
-          <IconButton
-            sx={{
-              position: "absolute",
-              top: 8,
-              left: 245,
-              width: 31,
-              height: 28,
-              backgroundColor: "#4d9cff",
-              borderRadius: 1,
-            }}
-          >
-            <ArrowForwardIcon sx={{ color: "white" }} />
-          </IconButton>
-          <IconButton
-            sx={{
-              position: "absolute",
-              top: 8,
-              left: 0,
-              width: 31,
-              height: 28,
-              backgroundColor: "#4d9cff",
-              borderRadius: 1,
-            }}
-          >
-            <ArrowBackIcon sx={{ color: "white" }} />
-          </IconButton>
-        </Box>
-        <Box sx={{ position: "relative", width: 214, height: 53, top: 190, left: 35 }}     //다음 미팅 관련 구역
-          >
-            <Typography
-              variant="h6"
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                fontWeight: "bold",
-                color: "black",
-              }}
-            >
-              다음 미팅
-            </Typography>
-            <Typography       //다음 미팅 날짜
-              variant="h6"
-              sx={{
-                position: "absolute",
-                top: 30,
-                left: 0,
-                fontWeight: "bold",
-                color: "black",
-              }}
-            >
-              11월 27일 오후 3시
-            </Typography>
-            <Button     //관리 버튼
-              variant="contained"
-              sx={{
-                position: "absolute",
-                top: 4,
-                left: 100,
-                width: 48,
-                height: 23,
-                backgroundColor: "#4d9cff",
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ color: "white", fontWeight: "bold" }}
-              >
-                관리
-              </Typography>
-            </Button>
-        </Box>
-        <Box        //Task 만들기 버튼을 붙일 패널
-          sx={{ position: "absolute", width: 158, height: 28, top: 708, left: 93 }}
-        >
-          <Button   //Task 만들기 버튼
-            variant="contained"
-            sx={{
-              width: 156,
-              height: 28,
-              backgroundColor: "#4d9cff",
-              borderRadius: 1,
-            }}
-            onClick={() => {
-              onGenerateTaskPress();}
-            }
-          >
-            <Typography
-              variant="h6"
-              sx={{ color: "white", fontWeight: "bold" }}
-            >
-              Task 만들기
-            </Typography>
-          </Button>
-        </Box>
-        
-        <Box     //하단 바 완성
-          sx={{
-            position: 'absolute',
-            width: 361,
-            height: 36,
-            top: 765,
-            left: 0,
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Button
-            variant="contained"
-            sx={{
-              width: 120,
-              height: 36,
-              backgroundColor: activeTab === '캘린더' ? '#4d9cff' : 'white',
-              borderRadius: 1,
-            }}
-            onClick={() => {
-              setActiveTab('캘린더');
-              onCalenderPress();}
-            }
-          >
-            <Typography variant="h6" sx={{ color: activeTab === '캘린더' ? 'white' : 'black', fontWeight: 'bold' }}>
-              캘린더
-            </Typography>
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              width: 120,
-              height: 36,
-              backgroundColor: activeTab === '구성원' ? '#4d9cff' : 'white',
-              borderRadius: 1,
-            }}            
-            onClick={() => {
-              setActiveTab('구성원');
-              onProjectLobbyPress();}
-            }
-          >
-            <Typography variant="h6" sx={{ color: activeTab === '구성원' ? 'white' : 'black', fontWeight: 'bold' }}>
-              구성원
-            </Typography>
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              width: 120,
-              height: 36,
-              backgroundColor: activeTab === '스케쥴' ? '#4d9cff' : 'white',
-              borderRadius: 1,
-            }}
-            onClick={() => {
-              setActiveTab('스케쥴');
-              onSchedulePress();}
-            }
-          >
-            <Typography variant="h6" sx={{ color: activeTab === '스케쥴' ? 'white' : 'black', fontWeight: 'bold' }}>
-              스케쥴
-            </Typography>
-          </Button>
-        </Box>
-      </Box>
-    </Box>
+    <Modal visible={visible} transparent={true} animationType="slide">
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text>작업 생성</Text>
+          {/* 입력 필드 추가 가능 */}
+          <TouchableOpacity onPress={handleSave}>
+            <Text>작업 저장</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onClose}>
+            <Text>닫기</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
   );
 };
+
+const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }) => {
+  const [isTaskModalVisible, setTaskModalVisible] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: "1", title: "진행 중 작업 1", assignees: ["홍길동"], status: "ongoing" },
+    { id: "2", title: "진행 중 작업 2", assignees: ["김철수"], status: "ongoing" },
+    { id: "3", title: "진행 중 작업 3", assignees: ["이영희"], status: "ongoing" },
+    { id: "4", title: "완료된 작업 1", assignees: ["박지민"], status: "completed" },
+    { id: "5", title: "완료된 작업 2", assignees: ["최민수"], status: "completed" },
+    { id: "6", title: "진행 중 작업 4", assignees: ["홍길동"], status: "ongoing" },
+    { id: "7", title: "완료된 작업 3", assignees: ["김철수"], status: "completed" },
+    { id: "8", title: "진행 중 작업 5", assignees: ["이영희"], status: "ongoing" },
+    { id: "9", title: "완료된 작업 4", assignees: ["박지민"], status: "completed" },
+    { id: "10", title: "진행 중 작업 6", assignees: ["최민수"], status: "ongoing" },
+  ]);
+  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const navigation = useNavigation(); // 네비게이션 훅 사용
+
+  const handleMeetingSchedule = () => {
+    Alert.alert("미팅 일정", "미팅 일정이 표시됩니다.");
+  };
+
+  const handleManageButton = () => {
+    Alert.alert("관리 버튼", "관리 옵션이 표시됩니다.");
+  };
+
+  const handleAddTask = (task: Task) => {
+    setTasks((prevTasks) => [...prevTasks, task]);
+  };
+
+  const handleRemindButton = (taskId: string) => {
+    Alert.alert("독촉하기", `작업 ${taskId}에 대해 독촉 메시지가 전송됩니다.`);
+  };
+
+  const handleOpenGenerateTask = () => {
+    setTaskModalVisible(true);
+  };
+
+  const handleCloseGenerateTask = () => {
+    setTaskModalVisible(false);
+  };
+
+  const handleSaveTask = (task: { deadline: string; assignees: string[] }) => {
+    const newTask: Task = {
+      id: new Date().toISOString(),
+      title: "새 작업",
+      assignees: task.assignees,
+      status: "ongoing",
+    };
+    handleAddTask(newTask);
+    setTaskModalVisible(false);
+  };
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.goBackButton} onPress={onBackPress}>
+        <Text style={styles.buttonText}>뒤로가기</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.dateText}>{date}</Text>
+
+      <View style={styles.buttonsRow}>
+        <Text style={styles.meetingText} onPress={handleMeetingSchedule}>
+          미팅 일정
+        </Text>
+        <Text style={styles.manageText} onPress={handleManageButton}>
+          관리
+        </Text>
+      </View>
+
+      <Text style={styles.sectionTitle}>진행 중인 작업</Text>
+      <ScrollView style={styles.taskContainer}>
+        {tasks
+          .filter((task) => task.status === "ongoing")
+          .slice(0, 3)
+          .map((task) => (
+            <View key={task.id} style={styles.taskItem}>
+              <View style={styles.taskRow}>
+                <Text style={styles.taskTitle}>{task.title}</Text>
+                <TouchableOpacity
+                  style={styles.remindButton}
+                  onPress={() => handleRemindButton(task.id)}
+                >
+                  <Text style={styles.buttonText}>독촉하기</Text>
+                </TouchableOpacity>
+              </View>
+              <Text>할당인원: {task.assignees.join(", ")}</Text>
+            </View>
+          ))}
+      </ScrollView>
+
+      <Text style={styles.sectionTitle}>완료된 작업</Text>
+      <ScrollView style={styles.taskContainer}>
+        {tasks
+          .filter((task) => task.status === "completed")
+          .slice(0, 3)
+          .map((task) => (
+            <View key={task.id} style={styles.taskItem}>
+              <Text style={styles.taskTitle}>{task.title}</Text>
+              <Text>할당인원: {task.assignees.join(", ")}</Text>
+            </View>
+          ))}
+      </ScrollView>
+
+      <TouchableOpacity style={styles.createButton} onPress={handleOpenGenerateTask}>
+        <Text style={styles.buttonText}>작업 만들기</Text>
+      </TouchableOpacity>
+
+      <GenerateTaskScreen
+        visible={isTaskModalVisible}
+        onClose={handleCloseGenerateTask}
+        onSave={handleSaveTask}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    backgroundColor: "#4A90E2",
+    padding: 20,
+  },
+  goBackButton: {
+    backgroundColor: "#5C99B2",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  dateText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#ffffff",
+  },
+  buttonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 20,
+  },
+  meetingText: {
+    fontSize: 18,
+    color: "#E3F2FD",
+    textDecorationLine: "underline",
+  },
+  manageText: {
+    fontSize: 18,
+    color: "#E3F2FD",
+    textDecorationLine: "underline",
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#ffffff",
+  },
+  taskContainer: {
+    width: "100%",
+    maxHeight: 300,
+    marginBottom: 20,
+  },
+  taskItem: {
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    width: "100%",
+  },
+  taskRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  taskTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+    flex: 1,
+  },
+  remindButton: {
+    backgroundColor: "#E94E77",
+    padding: 8,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  createButton: {
+    backgroundColor: "#81D4FA", // 파스텔 톤의 파란색
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "#ffffff", // 흰색 텍스트
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // 반투명 배경
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+});
 
 export default DaysDetailScreen;

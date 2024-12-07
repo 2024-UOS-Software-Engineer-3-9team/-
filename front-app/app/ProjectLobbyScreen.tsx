@@ -20,7 +20,7 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
 }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [projectData, setProjectData] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"캘린더" | "구성원" | "스케줄">("구성원"); // 탭 상태 추가
+  const [activeButton, setActiveButton] = useState<"calendar" | "member" | "schedule">("member");
   const { projectId, leader, setProjectId, setLeader } = useProject();
 
   // AsyncStorage에서 토큰 가져오기
@@ -81,6 +81,17 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     fetchProjectData();
   }, [accessToken, projectId]);
 
+  const handleButtonPress = (button: "calendar" | "member" | "schedule") => {
+    setActiveButton(button);
+    if (button === "calendar") {
+      onCalendarPress();
+    } else if (button === "member") {
+      onAddMemberPress();
+    } else if (button === "schedule") {
+      onSchedulePress();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -93,7 +104,7 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
         </TouchableOpacity>
       </View>
 
-      {activeTab === "구성원" && (
+      {activeButton === "member" && (
         <FlatList
           data={projectData}
           renderItem={({ item }) => (
@@ -109,30 +120,25 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
         />
       )}
 
-      <View style={styles.footer}>
+      {/* 하단 네비게이션 버튼 (고정) */}
+      <View style={styles.fixedFooter}>
         <TouchableOpacity
-          style={[styles.footerButton, activeTab === "캘린더" && styles.activeButton]}
-          onPress={() => {
-            setActiveTab("캘린더");
-            onCalendarPress();
-          }}
+          style={[styles.footerButton, activeButton === "calendar" ? styles.activeButton : styles.inactiveButton]}
+          onPress={() => handleButtonPress("calendar")}
         >
           <Text style={styles.footerButtonText}>캘린더</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.footerButton, activeTab === "구성원" && styles.activeButton]}
-          onPress={() => setActiveTab("구성원")}
+          style={[styles.footerButton, activeButton === "member" ? styles.activeButton : styles.inactiveButton]}
+          onPress={() => handleButtonPress("member")}
         >
           <Text style={styles.footerButtonText}>구성원</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.footerButton, activeTab === "스케줄" && styles.activeButton]}
-          onPress={() => {
-            setActiveTab("스케줄");
-            onSchedulePress();
-          }}
+          style={[styles.footerButton, activeButton === "schedule" ? styles.activeButton : styles.inactiveButton]}
+          onPress={() => handleButtonPress("schedule")}
         >
           <Text style={styles.footerButtonText}>스케줄</Text>
         </TouchableOpacity>
@@ -168,11 +174,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cardButtonText: { color: "#FFFFFF", fontSize: 12 },
-  footer: {
+  fixedFooter: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "space-around",
     backgroundColor: "#FFFFFF",
     paddingVertical: 12,
+    zIndex: 10,
   },
   footerButton: {
     flex: 1,
@@ -180,9 +191,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   activeButton: {
-    backgroundColor: "#003C8F", // 활성화된 버튼은 파란색
+    backgroundColor: "#003C8F",
   },
-  footerButtonText: { color: "#000000", fontSize: 14 },
+  inactiveButton: {
+    backgroundColor: "#E0E0E0",
+  },
+  footerButtonText: {
+    color: "#000000",
+    fontSize: 14,
+  },
   addButton: {
     position: "absolute",
     bottom: 80,
