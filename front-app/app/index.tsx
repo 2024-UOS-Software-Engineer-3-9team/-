@@ -81,7 +81,8 @@ export default function Index() {
             onBackPress={() => setCurrentScreen("ProjectList")}
             onAlarmPress={() => setCurrentScreen("AlarmTeam")}
             onAddMemberPress={() => setCurrentScreen("Invite")}
-            onSchedulePress={() => setCurrentScreen("ScheduleLobby")} // 스케줄 버튼 연결
+            onCalenderPress={() => setCurrentScreen("CalenderLobby")}
+            onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
           />
         );
       case "AlarmTeam":
