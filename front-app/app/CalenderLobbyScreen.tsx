@@ -49,6 +49,10 @@ useEffect(() => {
   initializeData();
 }, []);
 
+useEffect(() => {
+  console.log(tasks);
+}, [tasks])
+
 const fetchTasksFromServer = async (accessToken: string) => {
   try {
     const response = await fetch(
@@ -71,9 +75,11 @@ const fetchTasksFromServer = async (accessToken: string) => {
 
     const data = await response.json();
     const formattedTasks = data.map((task: any) => ({
-      id: task[0],
-      date: task[2],
-      task: task[1]
+      id: task.taskId,
+      date: task.dueDate.slice(0, 10),
+      task: task.taskName,
+      isDone: task.isDone,
+      users: task.userIds,
     }));
     setTasks(formattedTasks);
   } catch (error) {
@@ -446,5 +452,4 @@ const styles = StyleSheet.create({
 });
 
 export default CalendarLobbyScreen;
-
 
