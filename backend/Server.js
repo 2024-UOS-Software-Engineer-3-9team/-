@@ -421,7 +421,6 @@ app.get("/projects/:proj_id/myschedules", authenticateToken, async (req, res) =>
 //     }
 // });
 
-
 //미팅 만들기
 app.post("/projects/:proj_id/schedule/makeMeet", authenticateToken, async(req, res) => {
     const { proj_id } = req.params;
