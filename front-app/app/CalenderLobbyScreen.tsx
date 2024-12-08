@@ -1,29 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, ScrollView } from "react-native";
-import { format, addDays, subDays } from "date-fns"; // 날짜 포맷을 위한 라이브러리
-import GenerateTaskScreen from "./GenerateTaskScreen"; // GenerateTaskScreen 가져오기
-
-// 더미 데이터
-const tasks = [
-  { id: "1", date: "2024-12-08", task: "프로젝트 회의 준비" },
-  { id: "2", date: "2024-12-08", task: "코드 리뷰" },
-  { id: "3", date: "2024-12-09", task: "문서 작성" },
-  { id: "4", date: "2024-12-09", task: "디자인 피드백" },
-  { id: "5", date: "2024-12-10", task: "제품 발표 준비" },
-  { id: "6", date: "2024-12-11", task: "팀 회의" },
-  { id: "7", date: "2024-12-12", task: "마케팅 전략 논의" },
-  { id: "8", date: "2024-12-13", task: "디버깅" },
-  { id: "9", date: "2024-12-14", task: "테스트 계획 작성" },
-  { id: "10", date: "2024-12-15", task: "배포 준비" },
-];
+import { format, addDays } from "date-fns"; 
+import GenerateTaskScreen from "./GenerateTaskScreen";
+import { useProject } from './context/ProjectContext';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface ProjectLobbyScreenProps {
   onCalenderPress: () => void;
   onProjectLobbyPress: () => void;
   onSchedulePress: () => void;
   onBackPress: () => void;
-  setCurrentScreen: (screen: string) => void; // 추가
-  setChosenDate: (date: string) => void; // 변수 이름 변경
+  setCurrentScreen: (screen: string) => void; 
+  setChosenDate: (date: string) => void; 
 }
 
 const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
@@ -37,14 +25,68 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeButton, setActiveButton] = useState<"calendar" | "member" | "schedule">("calendar");
   const [showNotices, setShowNotices] = useState(false);
-  const [isTaskModalVisible, setTaskModalVisible] = useState(false); // 팝업 상태 관리
+  const [isTaskModalVisible, setTaskModalVisible] = useState(false); 
+  const [tasks, setTasks] = useState([]); 
+  const { projectId, leader, setProjectId, setLeader } = useProject();
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  // 날짜별로 작업 필터링
+useEffect(() => {
+  const initializeData = async () => {
+    try {
+      const storedToken = await AsyncStorage.getItem("accessToken");
+      if (storedToken) {
+        setAccessToken(storedToken);
+        fetchTasksFromServer(storedToken);
+      } else {
+        Alert.alert("오류", "로그인이 필요합니다. 다시 로그인 해주세요.");
+      }
+    } catch (error) {
+      console.error("토큰 가져오기 실패:", error);
+      Alert.alert("오류", "토큰을 가져오는 중 문제가 발생했습니다.");
+    }
+  };
+
+  initializeData();
+}, []);
+
+const fetchTasksFromServer = async (accessToken: string) => {
+  try {
+    const response = await fetch(
+      `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/tasks`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      console.error('서버 오류 메시지:', errorMessage);
+      Alert.alert('오류', `서버 오류: ${errorMessage}`);
+      return;
+    }
+
+    const data = await response.json();
+    const formattedTasks = data.map((task: any) => ({
+      id: task[0],
+      date: task[2],
+      task: task[1]
+    }));
+    setTasks(formattedTasks);
+  } catch (error) {
+    console.error('작업 가져오기 중 오류 발생:', error);
+    Alert.alert('오류', '작업을 불러오는 중 문제가 발생했습니다.');
+  }
+};
+
+
   const getTasksForDate = (date: string) => {
     return tasks.filter((task) => task.date === date);
   };
 
-  // 7일의 날짜 범위 설정 (오늘부터 7일)
   const getDateRange = () => {
     let dateRange = [];
     for (let i = 0; i < 7; i++) {
@@ -53,7 +95,6 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     return dateRange;
   };
 
-  // 날짜 변경 (이전, 다음)
   const changeDate = (direction: "prev" | "next") => {
     const newDate = new Date(selectedDate);
     if (direction === "next") {
@@ -76,27 +117,25 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   };
 
   const handleOpenGenerateTask = () => {
-    setTaskModalVisible(true); // "작업 만들기" 버튼 클릭 시 팝업 띄우기
+    setTaskModalVisible(true); 
   };
 
   const handleCloseGenerateTask = () => {
-    setTaskModalVisible(false); // 팝업 닫기
+    setTaskModalVisible(false); 
   };
 
   const handleSaveTask = (task: { deadline: string; assignees: string[] }) => {
-    // 작업 저장 로직
     console.log("작업 저장:", task);
-    setTaskModalVisible(false); // 작업 저장 후 팝업 닫기
-  };  
-  
+    setTaskModalVisible(false); 
+  };
+
   const handleDatePress = (date: string) => {
-    setChosenDate(date); // 외부 상태 업데이트
-    setCurrentScreen("DaysDetail"); // DaysDetail 화면으로 전환
+    setChosenDate(date); 
+    setCurrentScreen("DaysDetail"); 
   };
 
   return (
     <View style={styles.container}>
-      {/* 헤더 */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBackPress}>
           <Text style={styles.backButton}>←</Text>
@@ -105,7 +144,6 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
       </View>
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* 날짜별 작업 표 (맨 위 부분) */}
         <View style={styles.taskTableContainer}>
           <Text style={styles.sectionTitle}>날짜별 작업 표</Text>
           <View style={styles.dateNav}>
@@ -124,7 +162,7 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
                 <TouchableOpacity
                   key={index}
                   style={styles.tableCell}
-                  onPress={() => handleDatePress(date)} // 날짜 클릭 시 동작
+                  onPress={() => handleDatePress(date)} 
                 >
                   <Text style={styles.tableHeaderCell}>{format(new Date(date), "MM/dd")}</Text>
                   {getTasksForDate(date).map((task) => (
@@ -138,7 +176,6 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
           </View>
         </View>
 
-        {/* 중요 공지사항 (중간 부분) */}
         <View style={styles.notice}>
           <Text style={styles.noticeText}>중요 공지: 내일까지 제출해야 하는 보고서가 있습니다!</Text>
           {showNotices && (
@@ -153,14 +190,14 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
           </TouchableOpacity>
         </View>
 
-        {/* 작업 목록과 완료 버튼, 작업 만들기 버튼 (맨 아래 부분) */}
         <View style={styles.taskListContainer}>
           <Text style={styles.title}>작업 목록</Text>
           <FlatList
             data={tasks}
             renderItem={({ item }) => (
               <View style={styles.taskItem}>
-                <Text style={styles.taskText}>{item.task}</Text>
+                <Text style={styles.taskText}>작업명: {item.task}</Text>
+                <Text style={styles.taskText}>마감일: {item.date}</Text>
                 <TouchableOpacity
                   style={styles.completeButton}
                   onPress={() => Alert.alert("완료", `${item.task}가 완료되었습니다.`)}
@@ -169,19 +206,15 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
                 </TouchableOpacity>
               </View>
             )}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()} // 🔥 고유 키 보장
+
           />
         </View>
 
-        {/* 작업 만들기 버튼 */}
-        <TouchableOpacity style={styles.createTaskButton} onPress={() => {
-            Alert.alert("작업 만들기", "새로운 작업을 추가해주세요.");
-            handleOpenGenerateTask();
-          }}>
+        <TouchableOpacity style={styles.createTaskButton} onPress={handleOpenGenerateTask}>
           <Text style={styles.createTaskButtonText}>작업 만들기</Text>
         </TouchableOpacity>
 
-        {/* GenerateTaskScreen 팝업 */}
         <GenerateTaskScreen
           visible={isTaskModalVisible}
           onClose={handleCloseGenerateTask}
@@ -189,7 +222,6 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
         />
       </ScrollView>
 
-      {/* 하단 네비게이션 버튼 (고정) */}
       <View style={styles.fixedFooter}>
         <TouchableOpacity
           style={[styles.footerButton, activeButton === "calendar" ? styles.activeButton : styles.inactiveButton]}
@@ -414,3 +446,5 @@ const styles = StyleSheet.create({
 });
 
 export default CalendarLobbyScreen;
+
+

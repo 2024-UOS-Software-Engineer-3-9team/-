@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Modal } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
 import { format } from "date-fns";
-import { useNavigation } from '@react-navigation/native'; // 네비게이션 훅 사용
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useProject } from './context/ProjectContext';
 import GenerateTaskScreen from "./GenerateTaskScreen"; // GenerateTaskScreen 가져오기
 
 interface Task {
@@ -13,20 +15,65 @@ interface Task {
 
 const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }) => {
   const [isTaskModalVisible, setTaskModalVisible] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: "1", title: "진행 중 작업 1", assignees: ["홍길동"], status: "ongoing" },
-    { id: "2", title: "진행 중 작업 2", assignees: ["김철수"], status: "ongoing" },
-    { id: "3", title: "진행 중 작업 3", assignees: ["이영희"], status: "ongoing" },
-    { id: "4", title: "완료된 작업 1", assignees: ["박지민"], status: "completed" },
-    { id: "5", title: "완료된 작업 2", assignees: ["최민수"], status: "completed" },
-    { id: "6", title: "진행 중 작업 4", assignees: ["홍길동"], status: "ongoing" },
-    { id: "7", title: "완료된 작업 3", assignees: ["김철수"], status: "completed" },
-    { id: "8", title: "진행 중 작업 5", assignees: ["이영희"], status: "ongoing" },
-    { id: "9", title: "완료된 작업 4", assignees: ["박지민"], status: "completed" },
-    { id: "10", title: "진행 중 작업 6", assignees: ["최민수"], status: "ongoing" },
-  ]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const navigation = useNavigation(); // 네비게이션 훅 사용
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const { projectId } = useProject();
+  const navigation = useNavigation(); 
+
+  // 📢 서버에서 작업 목록 가져오기
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("accessToken");
+        if (storedToken) {
+          setAccessToken(storedToken);
+          fetchTasksFromServer(storedToken);
+        } else {
+          Alert.alert("오류", "로그인이 필요합니다. 다시 로그인 해주세요.");
+        }
+      } catch (error) {
+        console.error("토큰 가져오기 실패:", error);
+        Alert.alert("오류", "토큰을 가져오는 중 문제가 발생했습니다.");
+      }
+    };
+
+    fetchAccessToken();
+  }, []);
+
+  const fetchTasksFromServer = async (accessToken: string) => {
+    try {
+      const response = await fetch(
+        `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/tasks`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        console.error('서버 오류 메시지:', errorMessage);
+        Alert.alert('오류', `서버 오류: ${errorMessage}`);
+        return;
+      }
+
+      const data = await response.json();
+      const formattedTasks = data.map((task: any) => ({
+        id: task.taskId.toString(),
+        title: task.taskName,
+        assignees: task.userIds,
+        status: task.isDone === 1 ? "completed" : "ongoing",
+      }));
+      setTasks(formattedTasks);
+    } catch (error) {
+      console.error('작업 가져오기 중 오류 발생:', error);
+      Alert.alert('오류', '작업을 불러오는 중 문제가 발생했습니다.');
+    }
+  };
 
   const handleMeetingSchedule = () => {
     Alert.alert("미팅 일정", "미팅 일정이 표시됩니다.");
@@ -84,7 +131,6 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
       <ScrollView style={styles.taskContainer}>
         {tasks
           .filter((task) => task.status === "ongoing")
-          .slice(0, 3)
           .map((task) => (
             <View key={task.id} style={styles.taskItem}>
               <View style={styles.taskRow}>
@@ -105,7 +151,6 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
       <ScrollView style={styles.taskContainer}>
         {tasks
           .filter((task) => task.status === "completed")
-          .slice(0, 3)
           .map((task) => (
             <View key={task.id} style={styles.taskItem}>
               <Text style={styles.taskTitle}>{task.title}</Text>
@@ -126,7 +171,6 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
