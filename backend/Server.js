@@ -448,38 +448,38 @@ app.get("/projects/:proj_id/myschedules", authenticateToken, async (req, res) =>
 });
 
 //스케쥴 수정 만들것
-app.put("/projects/:proj_id/scheduleUpdate", authenticateToken, async (req, res) => {
-    const { proj_id } = req.params;
-    const { user_id } = req.user;
-    const { new_time, date_meet } = req.body;      //한 주의 시작과 끝
-    let connection;
-    try{
-        connection = await connectToDatabase();
-        if(!connection){
-            return res.status(500).send("DB 연결에 실패했습니다.");
-        }
+// app.put("/projects/:proj_id/scheduleUpdate", authenticateToken, async (req, res) => {
+//     const { proj_id } = req.params;
+//     const { user_id } = req.user;
+//     const { new_time, date_meet } = req.body;      //한 주의 시작과 끝
+//     let connection;
+//     try{
+//         connection = await connectToDatabase();
+//         if(!connection){
+//             return res.status(500).send("DB 연결에 실패했습니다.");
+//         }
 
-        if (!date_meet || !new_time) {
-            return res.status(400).send("date_meet, new_time은 필수 입력값입니다.");
-        }
+//         if (!date_meet || !new_time) {
+//             return res.status(400).send("date_meet, new_time은 필수 입력값입니다.");
+//         }
 
-        const result = await connection.execute(
-            "UPDATE TABLE_SCHEDULE SET TIME = :new_time WHERE PROJ_ID = :proj_id AND USER_ID = :user_id AND DATE_MEET = TO_DATE(:date_meet, 'YYYY-MM-DD')",
-            {proj_id, user_id, date_meet, new_time},
-            {autoCommit: true}
-        );
+//         const result = await connection.execute(
+//             "UPDATE TABLE_SCHEDULE SET TIME = :new_time WHERE PROJ_ID = :proj_id AND USER_ID = :user_id AND DATE_MEET = TO_DATE(:date_meet, 'YYYY-MM-DD')",
+//             {proj_id, user_id, date_meet, new_time},
+//             {autoCommit: true}
+//         );
 
-        if (result.rowsAffected === 0) {
-            return res.status(404).send("해당하는 스케줄을 찾을 수 없습니다.");
-        }
-        res.status(201).send("스케쥴 수정이 완료 되었습니다.");
-    }catch(err){
-        console.error(err);
-        res.status(500).send("스케쥴 수정 중 오류가 발생했습니다.");
-    }finally{
-        await closeConnection(connection);
-    }
-});
+//         if (result.rowsAffected === 0) {
+//             return res.status(404).send("해당하는 스케줄을 찾을 수 없습니다.");
+//         }
+//         res.status(201).send("스케쥴 수정이 완료 되었습니다.");
+//     }catch(err){
+//         console.error(err);
+//         res.status(500).send("스케쥴 수정 중 오류가 발생했습니다.");
+//     }finally{
+//         await closeConnection(connection);
+//     }
+// });
 
 
 //미팅 만들기
