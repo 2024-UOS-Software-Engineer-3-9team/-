@@ -51,12 +51,14 @@
 ## Technology Stacks
 | Field | Tools |
 |:------:|:----:|
-| Front-end | Figma / React / React Native |
+| Front-end | Figma / React Native / expo |
 | Back-end | Node.js / Express.js |
 | DataBase | SQL developer (ORACLE 기반) |
 
 ## Installation Guideline
-<br>
+이거 생각을 해봤는데 어느정도 만들어지고 apk 배포 링크 하나 만드는게 좋을듯! <br>
+아니면 서버 하나 더 띄어서 웹 배포 링크도 뿌리고. 일단 apk 배포링크 하는 걸 우선으로 하겠습니다 <br>
+프로젝트 느낌 완성되고 데모비디오와 함께 수정하겠습니다
 
 ## Project Deliverables
 | Document | Link |
