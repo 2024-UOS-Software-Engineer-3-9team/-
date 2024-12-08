@@ -21,16 +21,18 @@ interface ProjectLobbyScreenProps {
   onCalenderPress: () => void;
   onProjectLobbyPress: () => void;
   onSchedulePress: () => void;
-  // onGenerateTaskPress: () => void;
   onBackPress: () => void;
+  setCurrentScreen: (screen: string) => void; // 추가
+  setChosenDate: (date: string) => void; // 변수 이름 변경
 }
 
 const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   onCalenderPress,
   onProjectLobbyPress,
   onSchedulePress,
-  // onGenerateTaskPress,
   onBackPress,
+  setCurrentScreen,
+  setChosenDate,
 }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeButton, setActiveButton] = useState<"calendar" | "member" | "schedule">("calendar");
@@ -85,6 +87,11 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     // 작업 저장 로직
     console.log("작업 저장:", task);
     setTaskModalVisible(false); // 작업 저장 후 팝업 닫기
+  };  
+  
+  const handleDatePress = (date: string) => {
+    setChosenDate(date); // 외부 상태 업데이트
+    setCurrentScreen("DaysDetail"); // DaysDetail 화면으로 전환
   };
 
   return (
@@ -114,24 +121,19 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
           <View style={styles.table}>
             <View style={styles.tableHeader}>
               {getDateRange().map((date, index) => (
-                <Text key={index} style={styles.tableHeaderCell}>
-                  {format(new Date(date), "MM/dd")}
-                </Text>
+                <TouchableOpacity
+                  key={index}
+                  style={styles.tableCell}
+                  onPress={() => handleDatePress(date)} // 날짜 클릭 시 동작
+                >
+                  <Text style={styles.tableHeaderCell}>{format(new Date(date), "MM/dd")}</Text>
+                  {getTasksForDate(date).map((task) => (
+                    <Text key={task.id} style={styles.taskText}>
+                      {task.task}
+                    </Text>
+                  ))}
+                </TouchableOpacity>
               ))}
-            </View>
-            <View style={styles.tableRow}>
-              {getDateRange().map((date, index) => {
-                const taskList = getTasksForDate(date);
-                return (
-                  <View key={index} style={styles.tableCell}>
-                    {taskList.length > 0 ? (
-                      taskList.map((task) => <Text key={task.id} style={styles.taskText}>{task.task}</Text>)
-                    ) : (
-                      <Text style={styles.taskText}>작업 없음</Text>
-                    )}
-                  </View>
-                );
-              })}
             </View>
           </View>
         </View>

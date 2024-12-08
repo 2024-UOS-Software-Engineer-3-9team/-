@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Modal } from "react-native";
 import { format } from "date-fns";
 import { useNavigation } from '@react-navigation/native'; // 네비게이션 훅 사용
+import GenerateTaskScreen from "./GenerateTaskScreen"; // GenerateTaskScreen 가져오기
 
 interface Task {
   id: string;
@@ -9,36 +10,6 @@ interface Task {
   assignees: string[];
   status: "ongoing" | "completed";
 }
-
-const GenerateTaskScreen: React.FC<{
-  visible: boolean;
-  onClose: () => void;
-  onSave: (task: { deadline: string; assignees: string[] }) => void;
-}> = ({ visible, onClose, onSave }) => {
-  const [deadline, setDeadline] = useState("");
-  const [assignees, setAssignees] = useState<string[]>([]);
-
-  const handleSave = () => {
-    onSave({ deadline, assignees });
-  };
-
-  return (
-    <Modal visible={visible} transparent={true} animationType="slide">
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text>작업 생성</Text>
-          {/* 입력 필드 추가 가능 */}
-          <TouchableOpacity onPress={handleSave}>
-            <Text>작업 저장</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onClose}>
-            <Text>닫기</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-};
 
 const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }) => {
   const [isTaskModalVisible, setTaskModalVisible] = useState(false);

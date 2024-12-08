@@ -40,7 +40,7 @@ export default function Index() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setCurrentScreen("DaysDetail"); // 2초 후 로그인 화면으로 전환
+      setCurrentScreen("Login"); // 2초 후 로그인 화면으로 전환
     }, 2000);
     return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
   }, []);
@@ -109,15 +109,14 @@ export default function Index() {
             onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
             // onGenerateTaskPress={() => setCurrentScreen("GenerateTask")}
             onBackPress={() => setCurrentScreen("ProjectLobby")}
+            setCurrentScreen={() => setCurrentScreen("DaysDetail")}
+            setChosenDate={() => setCurrentScreen("DaysDetail")}
             />
           );
         case "DaysDetail":
           return (
             <DaysDetailScreen 
-            onCalenderPress={() => setCurrentScreen("CalenderLobby")}
-            onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
-            onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
-            // onGenerateTaskPress={() => setCurrentScreen("GenerateTask")}
+            onBackPress={() => setCurrentScreen("CalenderLobby")}
             />
           );
         // case "GenerateTask":

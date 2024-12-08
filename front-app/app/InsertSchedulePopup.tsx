@@ -22,10 +22,13 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
 
   // 팝업이 열릴 때 초기 상태 설정
   useEffect(() => {
-    setSelectedCells(new Set(initialSelectedCells));
     if(selectedCells)
     {
       setSelectedCells(selectedCells);
+    }
+    else
+    {
+      setSelectedCells(new Set(initialSelectedCells));
     }
   }, [initialSelectedCells]);
 

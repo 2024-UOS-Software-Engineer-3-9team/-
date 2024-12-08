@@ -54,9 +54,11 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
 
   const getCellsFromSchedule = (schedules: Schedule[]): Set<string> => {
     const selectedCells = new Set<string>();
+
+    console.log(selectedCells);
   
     // schedules를 순회하면서 1인 값의 인덱스를 찾음
-    for(let i=0; i<7; i++)
+    for(let i=0; i<schedules.length; i++)
     {
       for (let j = 0; j < 24; j++) {
         if (schedules[i].TIME[j] === '1') {
@@ -64,14 +66,12 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
         }
       }
     }
-
-    console.log(selectedCells);
   
     return selectedCells;
   };
 
   useEffect(() => {
-    if (schedules.length > 0 && !schedules[0].DATE_MEET)
+    if (schedules.length > 0)
     {
       setSelectedCells(getCellsFromSchedule(schedules));
       // console.log(schedules[0].TIME[5]);
@@ -80,7 +80,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
 
   const fetchSchedules = async() => {
     try {
-      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/schedules?start_day=2024-12-01&end_day=2024-12-07`, {
+      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/schedules?start_day=2024-12-01&end_day=2024-12-08`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
