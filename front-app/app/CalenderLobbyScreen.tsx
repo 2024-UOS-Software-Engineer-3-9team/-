@@ -88,6 +88,39 @@ const fetchTasksFromServer = async (accessToken: string) => {
   }
 };
 
+const markTaskAsComplete = async (taskId: string) => {
+  try {
+    const response = await fetch(
+      `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/tasks/isdone`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ task_id: taskId })
+      }
+    );
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      console.error('서버 오류 메시지:', errorMessage);
+      Alert.alert('오류', `서버 오류: ${errorMessage}`);
+      return;
+    }
+
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, isDone: 1 } : task
+    );
+    setTasks(updatedTasks);
+    Alert.alert("성공", "작업이 완료되었습니다.");
+  } catch (error) {
+    console.error('작업 완료 중 오류 발생:', error);
+    Alert.alert('오류', '작업 완료 중 오류가 발생했습니다.');
+  }
+};
+
+
 
   const getTasksForDate = (date: string) => {
     return tasks.filter((task) => task.date === date);
@@ -206,9 +239,11 @@ const fetchTasksFromServer = async (accessToken: string) => {
                 <Text style={styles.taskText}>마감일: {item.date}</Text>
                 <TouchableOpacity
                   style={styles.completeButton}
-                  onPress={() => Alert.alert("완료", `${item.task}가 완료되었습니다.`)}
+                  onPress={() => markTaskAsComplete(item.id)} 
+                  disabled={item.isDone === 1} // 🔥 완료된 경우 비활성화
                 >
-                  <Text style={styles.completeButtonText}>완료</Text>
+                  <Text style={styles.completeButtonText}>
+                  {item.isDone === 1 ? "완료됨" : "완료"} </Text>
                 </TouchableOpacity>
               </View>
             )}

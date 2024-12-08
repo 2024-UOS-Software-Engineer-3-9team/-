@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useProject } from './context/ProjectContext';
-import GenerateTaskScreen from "./GenerateTaskScreen"; // GenerateTaskScreen 가져오기
+import GenerateTaskScreen from "./GenerateTaskScreen"; 
 
 interface Task {
   id: string;
@@ -75,39 +75,43 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
     }
   };
 
-  const handleMeetingSchedule = () => {
-    Alert.alert("미팅 일정", "미팅 일정이 표시됩니다.");
-  };
+  const updateTaskStatus = async (taskId: string) => {
+    try {
+      const response = await fetch(
+        `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/tasks/isdone`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ task_id: taskId }) // 요청 Body에 task_id 추가
+        }
+      );
 
-  const handleManageButton = () => {
-    Alert.alert("관리 버튼", "관리 옵션이 표시됩니다.");
-  };
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        console.error('서버 오류 메시지:', errorMessage);
+        
+        if (response.status === 404) {
+          Alert.alert('오류', '해당 TASK를 찾을 수 없습니다.');
+        } else if (response.status === 500) {
+          Alert.alert('오류', 'Task 완료 처리 중 오류가 발생했습니다.');
+        } else {
+          Alert.alert('오류', '서버 오류가 발생했습니다.');
+        }
 
-  const handleAddTask = (task: Task) => {
-    setTasks((prevTasks) => [...prevTasks, task]);
-  };
+        return;
+      }
 
-  const handleRemindButton = (taskId: string) => {
-    Alert.alert("독촉하기", `작업 ${taskId}에 대해 독촉 메시지가 전송됩니다.`);
-  };
-
-  const handleOpenGenerateTask = () => {
-    setTaskModalVisible(true);
-  };
-
-  const handleCloseGenerateTask = () => {
-    setTaskModalVisible(false);
-  };
-
-  const handleSaveTask = (task: { deadline: string; assignees: string[] }) => {
-    const newTask: Task = {
-      id: new Date().toISOString(),
-      title: "새 작업",
-      assignees: task.assignees,
-      status: "ongoing",
-    };
-    handleAddTask(newTask);
-    setTaskModalVisible(false);
+      Alert.alert('성공', '작업이 완료되었습니다.');
+      
+      // 서버 업데이트 후 클라이언트의 상태도 업데이트
+      setTasks((prevTasks) => prevTasks.filter(task => task.id !== taskId));
+    } catch (error) {
+      console.error('작업 상태 업데이트 중 오류 발생:', error);
+      Alert.alert('오류', '작업 상태를 업데이트하는 중 문제가 발생했습니다.');
+    }
   };
 
   return (
@@ -117,15 +121,6 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
       </TouchableOpacity>
 
       <Text style={styles.dateText}>{date}</Text>
-
-      <View style={styles.buttonsRow}>
-        <Text style={styles.meetingText} onPress={handleMeetingSchedule}>
-          미팅 일정
-        </Text>
-        <Text style={styles.manageText} onPress={handleManageButton}>
-          관리
-        </Text>
-      </View>
 
       <Text style={styles.sectionTitle}>진행 중인 작업</Text>
       <ScrollView style={styles.taskContainer}>
@@ -137,40 +132,20 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
                 <Text style={styles.taskTitle}>{task.title}</Text>
                 <TouchableOpacity
                   style={styles.remindButton}
-                  onPress={() => handleRemindButton(task.id)}
+                  onPress={() => updateTaskStatus(task.id)} 
                 >
-                  <Text style={styles.buttonText}>독촉하기</Text>
+                  <Text style={styles.buttonText}>완료</Text>
                 </TouchableOpacity>
               </View>
               <Text>할당인원: {task.assignees.join(", ")}</Text>
             </View>
           ))}
       </ScrollView>
-
-      <Text style={styles.sectionTitle}>완료된 작업</Text>
-      <ScrollView style={styles.taskContainer}>
-        {tasks
-          .filter((task) => task.status === "completed")
-          .map((task) => (
-            <View key={task.id} style={styles.taskItem}>
-              <Text style={styles.taskTitle}>{task.title}</Text>
-              <Text>할당인원: {task.assignees.join(", ")}</Text>
-            </View>
-          ))}
-      </ScrollView>
-
-      <TouchableOpacity style={styles.createButton} onPress={handleOpenGenerateTask}>
-        <Text style={styles.buttonText}>작업 만들기</Text>
-      </TouchableOpacity>
-
-      <GenerateTaskScreen
-        visible={isTaskModalVisible}
-        onClose={handleCloseGenerateTask}
-        onSave={handleSaveTask}
-      />
     </View>
   );
 };
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
