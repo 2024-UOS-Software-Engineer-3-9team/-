@@ -194,12 +194,6 @@ app.post("/home/newprojects", authenticateToken, async (req, res) => {
             { autoCommit: true }
         );
 
-        // PROJ_ID를 다시 조회
-        // const queryResult = await connection.execute(
-        //     "SELECT PROJ_ID FROM TABLE_PROJECT WHERE ROWID = :rowid",
-        //     { rowid: result.lastRowid } // lastRowid로 최근 입력된 행 식별
-        // );
-
         const createdProjId = result.outBinds.proj_id[0];
 
         if (!createdProjId) {
@@ -225,36 +219,6 @@ app.post("/home/newprojects", authenticateToken, async (req, res) => {
         await closeConnection(connection);
     }
 });
-
-
-// app.post("/home/newprojects", authenticateToken, async (req, res) => {
-//     const leader_id = req.user.user_id;
-//     const { proj_name } = req.body;
-//     let connection;
-//     try{
-//         connection = await connectToDatabase();
-//         if(!connection){
-//             return res.status(500).send("DB 연결에 실패했습니다.");
-//         }
-
-//         const result = await connection.execute(
-//             "INSERT INTO TABLE_PROJECT (PROJ_NAME, LEADER_ID) VALUES (:proj_name, :leader_id) RETURNING PROJ_ID INTO :proj_id",
-//             { proj_name, leader_id },
-//             { autoCommit: true }
-//         );
-
-//         const createProjId = result.outBinds.proj_id[0];
-
-//         res.status(201).json({message : "프로젝트가 성공적으로 생성되었습니다.", proj_id: createProjId});
-//     }catch(err){
-//         console.error(err);
-//         res.status(500).send("프로젝트 생성 중 오류가 발생했습니다.");
-//     }finally{
-//         await closeConnection(connection);
-//     }
-// });
-
-
 
 //------------프로젝트 화면 관련 API
 //팀 프로젝트 멤버 조회 (프로젝트 홈화면에서 표기)
@@ -321,30 +285,6 @@ app.post("/projects/:proj_id/invite", authenticateToken, async (req,res) => {
         await closeConnection(connection);
     }
 });
-
-//프로젝트 조회
-// app.get("/projects/my", authenticateToken, async (req, res) => {
-//     const {user_id} = req.user;
-//     let connection;
-//     try{
-//         connection = await connectToDatabase();
-//         const result = await connection.execute(
-//             "SELECT P.PROJ_ID, P.PROJ_NAME, P.LEADER_ID FROM PROJECT P JOIN USER_PROJ UP ON P.PROJ_ID WHERE UP.USER_ID = :user_id"
-//         );
-//         res.json(result.rows);
-//     }catch(err){
-//         console.error(err);
-//         res.status(500).send("프로젝트 조회 중 오류가 발생했습니다.");
-//     }finally{
-//         if(connection){
-//             try{
-//                 await connection.close();
-//             }catch(err){
-//                 console.error(err);
-//             }
-//         }
-//     }
-// });
 
 //스케쥴 등록
 
