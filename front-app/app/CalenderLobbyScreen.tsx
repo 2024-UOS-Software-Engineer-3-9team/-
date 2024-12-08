@@ -1,34 +1,45 @@
-import React from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Grid,
-  Paper,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Chip,
-  AppBar,
-  Toolbar,
-  Avatar,
-} from "@mui/material";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import GroupIcon from "@mui/icons-material/Group";
-import ScheduleIcon from "@mui/icons-material/Schedule";
+import { CheckBoxIcon } from "./icons/CheckBoxIcon"; // CheckBoxIcon import
+import { ArrowBackIcon } from "./icons/ArrowBackIcon"; // ArrowBackIcon import
+import { ArrowForwardIcon } from "./icons/ArrowForwardIcon"; // ArrowForwardIcon import
+import { CalendarTodayIcon } from "./icons/CalendarTodayIcon"; // CalendarTodayIcon import
+import { CheckBoxOutlineBlankIcon } from "./icons/CheckBoxOutlineBlankIcon"; // CheckBoxOutlineBlankIcon import
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, Button, Checkbox, IconButton, Typography } from "@mui/material";
+import React, { useState, useEffect } from "react";
 
-interface CalanderLobbyScreenProps {
-  onBackPress: () => void;
+interface CalenderLobbyScreenProps {
+  onCalenderPress: () => void;
+  onProjectLobbyPress: () => void;
+  onSchedulePress: () => void;
+  onGenerateTaskPress: () => void;
+  onDateCellClick: (date: number, event: React.MouseEvent) => void;
 }
 
-const CalenderLobbyScreen: React.FC<CalanderLobbyScreenProps> = ({ onBackPress }) => {
+
+const CalenderLobbyScreen: React.FC<CalenderLobbyScreenProps> = ({ 
+  onCalenderPress,
+  onProjectLobbyPress,
+  onSchedulePress,
+  onGenerateTaskPress,
+  onDateCellClick,
+}) => {
+  const [clickedDate, setClickedDate] = useState(null);
+  const OndateCellClick = (date, event) => {
+    setClickedDate(date); // 클릭한 날짜 상태 업데이트
+    console.log(`날짜: ${date}, 클릭 이벤트: `, event); // 클릭한 날짜와 이벤트 정보 출력
+  };
+
+  const [activeTab, setActiveTab] = useState<"캘린더" | "구성원" | "스케쥴">("캘린더");
+
+    // 날짜 클릭 시 호출되는 함수
+    const handleCellClick = (date: number, event: React.MouseEvent) => {
+      setClickedDate(date); // 클릭한 날짜 상태 업데이트
+      console.log(`날짜: ${date}, 클릭 이벤트: `, event); // 클릭된 날짜와 이벤트 정보 출력
+      onDateCellClick(date, event); // 부모에게 클릭한 날짜 전달
+    };
+    
   return (
-    <Box
+    <Box                        //전체 파란색 배경
       sx={{
         backgroundColor: "#4d9cff",
         display: "flex",
@@ -36,368 +47,457 @@ const CalenderLobbyScreen: React.FC<CalanderLobbyScreenProps> = ({ onBackPress }
         width: "100%",
       }}
     >
-      <Box
+      <Box                  // Java Jpanel같은 느낌으로 바깥 부분.
         sx={{
           backgroundColor: "#4d9cff",
+          overflow: "hidden",
           width: 360,
           height: 800,
+          left : 130,
           position: "relative",
         }}
       >
-        <Box
+          <Typography       //프로젝트 이름
+            variant="h3"
+            sx={{
+              position: "absolute",
+              top: 51,
+              left: 24,
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            일조매 개발
+          </Typography>
+          
+        <Box           
           sx={{
             position: "absolute",
-            width: 313,
-            height: 619,
+            width: 312,
+            height: 777,
             top: 124,
             left: 24,
-            backgroundColor: "white",
           }}
         >
-          <Box
+          <Box     //여기가 흰색 배경임.
             sx={{
               position: "absolute",
               width: 312,
-              height: 619,
+              height: 621,
               top: 0,
               left: 0,
               backgroundColor: "white",
             }}
           />
-          <Box
+           <Box              //상단 날짜 이동 구역 (양 버튼과 날짜)
+          sx={{ position: "absolute", width: 278, height: 29, top: 240, left: 0 }}
+        >
+          <Typography
+            variant="h6"
             sx={{
               position: "absolute",
-              width: 158,
-              height: 28,
-              top: 579,
-              left: 70,
+              top: 0,
+              left: 105,
+              fontWeight: "bold",
+              color: "black",
+            }}
+          >
+            11월 3째주
+          </Typography>
+          <IconButton
+            sx={{
+              position: "absolute",
+              top: 5,
+              left: 220,
+              width: 20,
+              height: 20,
               backgroundColor: "#4d9cff",
               borderRadius: 1,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{
-                fontFamily: "Inter-SemiBold, Helvetica",
-                fontWeight: "bold",
-                color: "white",
-              }}
-            >
-              Task 만들기
-            </Typography>
-          </Box>
-          <Box
+            <ArrowForwardIcon sx={{ color: "white" }} />
+          </IconButton>
+          <IconButton
             sx={{
               position: "absolute",
-              width: 278,
-              height: 28,
-              top: 200,
-              left: 55,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              top: 5,
+              left: 60,
+              width: 20,
+              height: 20,
+              backgroundColor: "#4d9cff",
+              borderRadius: 1,
             }}
           >
-            
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <IconButton
+            <ArrowBackIcon sx={{ color: "white" }} />
+          </IconButton>
+           </Box>
+          <Box        //Ongoing 텍스트배치 구역
+            sx={{
+              position: "absolute",
+              width: 312,
+              height: 634,
+              top: 450,
+              left: 0,
+            }}
+          >
+            <Box    //Ongoing 텍스트배치 관련
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                width: 312,
+                alignItems: "start",
+                gap: 1,
+                position: "absolute",
+                top: 0,
+                left: 0,
+              }}
+            >
+              <Box    //Ongoing 텍스트배치 관련
                 sx={{
-                  width: 31,
-                  height: 28,
-                  backgroundColor: "#4d9cff",
-                  borderRadius: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2.5,
+                  px: 2.5,
+                  py: 0,
+                  width: "100%",
                 }}
               >
-                <ArrowBackIosIcon sx={{ color: "white" }} />
-              </IconButton>
-              <Typography
+                <CalendarTodayIcon sx={{ width: 26, height: 26 }} />
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", color: "black" }}
+                >
+                  OnGoing
+                </Typography>
+              </Box>
+
+              <Box     // Ongoing의 각 멤버 정보 관련 저장한 박스
+                sx={{ display: "flex", flexDirection: "column", width: "100%" }}
+              >
+                <Box        //Task, 완료 버튼 그룹 1
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 2.5,
+                      py: 0,
+                      width: "90%",
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: "bold", color: "black" }}
+                    >
+                      Task 1
+                    </Typography>
+                    <Box sx={{ flexGrow: 0.3 }} />
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "black",
+                        color: "white",
+                        fontSize: 10,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      완료
+                    </Button>
+                </Box>
+                <Box        //Task, 완료 버튼 그룹 2
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 2.5,
+                      py: 0,
+                      width: "90%",
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: "bold", color: "black" }}
+                    >
+                      Task 2
+                    </Typography>
+                    <Box sx={{ flexGrow: 0.3 }} />
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "black",
+                        color: "white",
+                        fontSize: 10,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      완료
+                    </Button>
+                </Box>
+                <Box        //Task, 완료 버튼 그룹 3
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 2.5,
+                      py: 0,
+                      width: "90%",
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: "bold", color: "black" }}
+                    >
+                      Task 3
+                    </Typography>
+                    <Box sx={{ flexGrow: 0.3 }} />
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "black",
+                        color: "white",
+                        fontSize: 10,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      완료
+                    </Button>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box sx={{ position: "relative", width: 214, height: 53, top: 400, left: 35 }} //Notice board     //다음 미팅 관련 구역
+          >
+            <Typography      //제목
               variant="h6"
               sx={{
-                fontFamily: "Inter-SemiBold, Helvetica",
+                position: "absolute",
+                top: 0,
+                left: 0,
                 fontWeight: "bold",
                 color: "black",
               }}
             >
-              11월 3주차
+              Notice
             </Typography>
-              <IconButton
-                sx={{
-                  width: 31,
-                  height: 28,
-                  backgroundColor: "#4d9cff",
-                  borderRadius: 1,
-                }}
-              >
-                <ArrowForwardIosIcon sx={{ color: "white" }} />
-              </IconButton>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              position: "absolute",
-              width: 312,
-              height: 132,
-              top: 370,
-              left: 0,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Avatar src="/image-11.png" sx={{ width: 20, height: 20, left: 10 }} alt="Image" />
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: "Inter-SemiBold, Helvetica",
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-              >
-                Ongoing Task
-              </Typography>
-            </Box>
-            <List>
-              {["자료 조사", "자료 조사", "자료 조사", "자료 조사"].map((task, index) => (
-                <ListItem 
-                key={index}
-                sx={{
-                  paddingY: 0.3, // 세로 패딩을 줄여서 길이 감소
-                  paddingLeft: 2, // 좌측 패딩 조정 (필요에 따라 수정)
-                  paddingRight: 2, // 우측 패딩 조정 (필요에 따라 수정)
-                }}
-                >
-                  <ListItemText
-                    primary={task}
-                    primaryTypographyProps={{
-                      fontFamily: "Inter-SemiBold, Helvetica",
-                      fontWeight: "bold",
-                      color: "black",
-                    }}
-                  />
-                    <Chip
-                      label={index === 0 ? "완료" : "미완료"}
-                      color={index === 0 ? "primary" : "default"}
-                      sx={{
-                        fontFamily: "Inter-SemiBold, Helvetica",
-                        fontWeight: "bold",
-                        color: "white",
-                        backgroundColor: index === 0 ? "black" : "black",
-                      }}
-                    />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-          <Box
-            sx={{
-              position: "absolute",
-              width: 312,
-              height: 130,
-              top: 249,
-              left: 10,
-            }}
-          >
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: "Inter-SemiBold, Helvetica",
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-              >
-                Notice
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: "Inter-SemiBold, Helvetica",
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-              >
-                "자료 조사" 마감 시한 연장 (11/20 -{'>'} 11/26)
-                <br />
-                "미팅 잡기" 마감 시한 단축 (11/30 -{'>'} 11/26)
-                <br /><br />
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: "Inter-Bold, Helvetica",
-                  fontWeight: "bold",
-                  textAlign: "left",
-                  color: "black",
-                }}
-              >
-                미팅 예정 11월 27일 수요일
-              </Typography>
-            </Box>
-          </Box>
+            <Typography       //공지 1
+              sx={{
+                position: "absolute",
+                top: 30,
+                left: 0,
+                fontWeight: "bold",
+                color: "black",
+              }}
+            >
+              Notice1
+            </Typography>
+            <Typography        //공지 1 상세 내용
+              sx={{
+                position: "absolute",
+                top: 55,
+                left: 0,
+                color: "black",
+                fontSize: "0.8rem", // 글자 크기를 작게 설정
+              }}
+            >
+              apple
+
+            </Typography>
+            <Typography       //공지 2
+              sx={{
+                position: "absolute",
+                top: 80,
+                left: 0,
+                fontWeight: "bold",
+                color: "black",
+              }}
+            >
+              Notice1
+            </Typography>
+            <Typography        //공지 2 상세 내용
+              sx={{
+                position: "absolute",
+                top: 105,
+                left: 0,
+                color: "black",
+                fontSize: "0.8rem", // 글자 크기를 작게 설정
+              }}
+            >
+              apple
+
+            </Typography>
+            <Typography       //공지 3
+              sx={{
+                position: "absolute",
+                top: 130,
+                left: 0,
+                fontWeight: "bold",
+                color: "black",
+              }}
+            >
+              Notice1
+            </Typography>
+            <Typography        //공지 3 상세 내용
+              sx={{
+                position: "absolute",
+                top: 155,
+                left: 0,
+                color: "black",
+                fontSize: "0.8rem", // 글자 크기를 작게 설정
+              }}
+            >
+              apple
+
+            </Typography>
+
         </Box>
-        <Typography
-          variant="h4"
-          sx={{
-            position: "absolute",
-            top: 140,
-            left: 40,
-            fontFamily: "Inter-SemiBold, Helvetica",
-            fontWeight: "bold",
-            color: "black",
-          }}
+        <Box        //Task 만들기 버튼을 붙일 패널
+          sx={{ position: "absolute", width: 158, height: 28, top: 708, left: 93 }}
         >
-          캘린더
-        </Typography>
-        <Typography
-          variant="h6"
-          sx={{
-            position: "absolute",
-            top: 240,
-            left: 90,
-            fontFamily: "Inter-SemiBold, Helvetica",
-            fontWeight: "bold",
-            color: "black",
-          }}
-        >
-          TODO : 달력 그림
-        </Typography>
-        <Box
-          component="img"
-          src="/image.png"
-          alt="Image"
-          sx={{
-            position: "fixed",
-            width: 303,
-            height: 139,
-            top: 179,
-            left: 29,
-            objectFit: "cover",
-          }}
-        />
-        <AppBar position="fixed" sx={{ top: 0, left: 0, height: 91 }}>
-          <Toolbar>
-            <Box sx={{ flexGrow: 1 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Avatar src="/group-2.png" sx={{ width: 34, height: 9 }} alt="Group" />
-                  <Avatar src="/vector-2.svg" sx={{ width: 11, height: 11 }} alt="Vector" />
-                  <Avatar src="/image-2.svg" sx={{ width: 35, height: 9 }} alt="Image" />
-                  <Avatar src="/image-21.png" sx={{ width: 30, height: 30 }} alt="Image" />
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Avatar src="/union.svg" sx={{ width: 11, height: 11 }} alt="Union" />
-                  <Avatar src="/vector-stroke.svg" sx={{ width: 2, height: 11 }} alt="Vector stroke" />
-                  <Avatar src="/vector.svg" sx={{ width: 4, height: 2.5 }} alt="Vector" />
-                  <Avatar src="/100.png" sx={{ width: 11, height: 11 }} alt="Element" />
-                  <Avatar src="/group-5.png" sx={{ width: 11, height: 11 }} alt="Group" />
-                </Box>
-              </Box>
-            </Box>
-          </Toolbar>
-        </AppBar>
-        <Box
-          sx={{
-            position: "fixed",
-            width: 360,
-            height: 91,
-            top: 0,
-            left: 0,
-            backgroundColor: "#4d9cff",
-          }}
-        >
-          <Box
+          <Button   //Task 만들기 버튼
+            variant="contained"
             sx={{
-              position: "absolute",
-              width: 316,
-              height: 39,
-              top: 52,
-              left: 24,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              width: 156,
+              height: 28,
+              backgroundColor: "#4d9cff",
+              borderRadius: 1,
             }}
+            onClick={() => {
+              onGenerateTaskPress();}
+            }
           >
             <Typography
-              variant="h4"
-              sx={{
-                fontFamily: "Inter-SemiBold, Helvetica",
-                fontWeight: "bold",
-                color: "white",
-              }}
+              variant="h6"
+              sx={{ color: "white", fontWeight: "bold" }}
             >
-              일조매 개발
+              Task 만들기
             </Typography>
-            <Avatar src="/image-21.png" sx={{ width: 30, height: 30 }} alt="Image" />
-          </Box>
+          </Button>
         </Box>
-        <Box         //하단 바 
+        <Box     //하단 바 완성
+          sx={{
+            position: 'absolute',
+            width: 361,
+            height: 36,
+            top: 765,
+            left: 0,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Button
+            variant="contained"
             sx={{
-              position: "absolute",
-              width: 361,
+              width: 120,
               height: 36,
-              top: 765,
-              left: 0,
-              display: "flex",
-              justifyContent: "space-between",
+              backgroundColor: activeTab === '캘린더' ? '#4d9cff' : 'white',
+              borderRadius: 1,
             }}
+            onClick={() => {
+              setActiveTab('캘린더');
+              onCalenderPress();}
+            }
           >
-            <Button
-              variant="contained"
-              sx={{
-                width: 120,
-                height: 36,
-                backgroundColor: "#4d9cff",
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ color: "white", fontWeight: "bold" }}
-              >
-                캘린더
-              </Typography>
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                width: 120,
-                height: 36,
-                backgroundColor: "white",
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ color: "black", fontWeight: "bold" }}
-              >
-                구성원
-              </Typography>
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                width: 120,
-                height: 36,
-                backgroundColor: "white",
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ color: "black", fontWeight: "bold" }}
-              >
-                스케쥴
-              </Typography>
-            </Button>
-          </Box>
+            <Typography variant="h6" sx={{ color: activeTab === '캘린더' ? 'white' : 'black', fontWeight: 'bold' }}>
+              캘린더
+            </Typography>
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '구성원' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}            
+            onClick={() => {
+              setActiveTab('구성원');
+              onProjectLobbyPress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '구성원' ? 'white' : 'black', fontWeight: 'bold' }}>
+              구성원
+            </Typography>
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '스케쥴' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}
+            onClick={() => {
+              setActiveTab('스케쥴');
+              onSchedulePress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '스케쥴' ? 'white' : 'black', fontWeight: 'bold' }}>
+              스케쥴
+            </Typography>
+          </Button>
+        </Box>
       </Box>
+      <Box     //하단 바 완성
+          sx={{
+            position: 'relative',
+            width: 300,
+            height: 230,
+            top: 130,
+            left: -200,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+          >
+        <Table sx={{ 
+          position: "relative",
+          width: '100%', 
+          height: '100%', 
+          tableLayout: 'fixed', 
+          border: '1px solid black',
+          top: 0, 
+          left: 0,
+          zIndex: 10,
+          overflow: 'auto', 
+          }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ width: '10%', border: '1px solid black',padding: '1.5px', }}>날짜</TableCell> {/* 날짜 헤더*/}
+                  <TableCell sx={{ width: '90%', border: '1px solid black',padding: '1.5px',}}>Task 내용</TableCell> {/* Task 내용 헤더 */}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {/* 해당 부분 수정하여 Task 내용 및 날짜 넣어야 함 */}
+                {[...Array(7)].map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell
+                      sx={{
+                        width: '10%',
+                        border: '1px solid black',
+                        padding: '2px',  // 셀의 세로 길이를 작게 설정
+                        cursor: 'pointer', 
+                        '&:hover': {
+                          fontWeight: 'bold', 
+                        },
+                      }}
+                      onClick={(event) => OndateCellClick(index + 1, event)} // 클릭 시 날짜와 이벤트 넘기기
+                    >
+                      {index + 1} {/* 날짜 표시 */}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        border: '1px solid black',
+                        padding: '2px',  // 셀의 세로 길이를 작게 설정
+                      }}
+                    >
+                      {/* 각 Task 내용 */}
+                      {index === 0 ? '' : `Task 내용 ${index}`} 
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
     </Box>
   );
 };

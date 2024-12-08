@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Modal } from "react-native";
+import { ProjectProvider } from './context/ProjectContext'; // Context 추가
+
 import SplashScreen from "./SplashScreen";
 import LoginScreen from "./LoginScreen";
 import SignupScreen from "./SignupScreen";
@@ -11,7 +13,11 @@ import ProjectLobbyScreen from "./ProjectLobbyScreen";
 import AlarmTeamScreen from "./AlarmTeamScreen";
 import InviteScreen from "./InviteScreen";
 import ScheduleLobbyScreen from "./ScheduleLobbyScreen";
-import InsertSchedulePopup from "./InsertSchedulePopup";
+// import InsertSchedulePopup from "./InsertSchedulePopup";
+import CalenderLobbyScreen from "./CalenderLobbyScreen";
+import DaysDetailScreen from "./DaysDetailScreen";
+import GenerateTaskScreen from "./GenerateTaskScreen";
+import TODOModifyTaskPopup from "./TODOModifyTaskPopup";
 
 export default function Index() {
   const [currentScreen, setCurrentScreen] = useState<
@@ -26,6 +32,10 @@ export default function Index() {
     | "AlarmTeam"
     | "Invite"
     | "ScheduleLobby"
+    | "CalenderLobby"
+    | "DaysDetail"
+    | "GenerateTask"
+    | "TODOModifyTask"
   >("Splash");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); // 선택된 프로젝트 ID 저장
   const [isPopupVisible, setPopupVisible] = useState(false); // 팝업 표시 상태
@@ -71,42 +81,74 @@ export default function Index() {
       case "ProjectLobby":
         return (
           <ProjectLobbyScreen
-            projectId={selectedProjectId} // 선택된 프로젝트 ID 전달
             onBackPress={() => setCurrentScreen("ProjectList")}
             onAlarmPress={() => setCurrentScreen("AlarmTeam")}
             onAddMemberPress={() => setCurrentScreen("Invite")}
             onSchedulePress={() => setCurrentScreen("ScheduleLobby")} // 스케줄 버튼 연결
+            onCalendarPress={() => setCurrentScreen("CalenderLobby")}
           />
         );
       case "AlarmTeam":
         return <AlarmTeamScreen onBackPress={() => setCurrentScreen("ProjectLobby")} />;
       case "Invite":
-        return <InviteScreen onBackPress={() => setCurrentScreen("ProjectLobby")} />;
+        return <InviteScreen
+        projId={selectedProjectId!} // 선택된 프로젝트 ID 전달
+        onBackPress={() => setCurrentScreen("ProjectLobby")} />;
       case "ScheduleLobby":
         return (
           <ScheduleLobbyScreen
             onBackPress={() => setCurrentScreen("ProjectLobby")}
-            onOpenPopup={() => setPopupVisible(true)} // 팝업 열기
+            onCalendarPress={() => setCurrentScreen("CalenderLobby")}
+            onMemberPress={() => setCurrentScreen("ProjectLobby")}
+            onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
           />
         );
+        case "CalenderLobby":
+          return (
+            <CalenderLobbyScreen 
+            // onCalenderPress={() => setCurrentScreen("CalenderLobby")}
+            // onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
+            // onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
+            // onGenerateTaskPress={() => setCurrentScreen("GenerateTask")}
+            />
+          );
+        case "DaysDetail":
+          return (
+            <DaysDetailScreen 
+            onCalenderPress={() => setCurrentScreen("CalenderLobby")}
+            onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
+            onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
+            onGenerateTaskPress={() => setCurrentScreen("GenerateTask")}
+            />
+          );
+        case "GenerateTask":
+          return (
+            <GenerateTaskScreen
+            onCalenderPress={() => setCurrentScreen("CalenderLobby")}
+            onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
+            onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
+            />
+          );
       default:
         return null;
     }
   };
 
   return (
-    <View style={styles.container}>
-      {renderScreen()}
-      {/* 팝업 모달 */}
-      <Modal
-        visible={isPopupVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setPopupVisible(false)} // 뒤로가기 시 닫기
-      >
-        <InsertSchedulePopup onClose={() => setPopupVisible(false)} />
-      </Modal>
-    </View>
+    <ProjectProvider>
+      <View style={styles.container}>
+        {renderScreen()}
+        {/* 팝업 모달 */}
+        <Modal
+          visible={isPopupVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setPopupVisible(false)} // 뒤로가기 시 닫기
+        >
+          {/* <InsertSchedulePopup onClose={() => setPopupVisible(false)} /> */}
+        </Modal>
+      </View>
+    </ProjectProvider>
   );
 }
 

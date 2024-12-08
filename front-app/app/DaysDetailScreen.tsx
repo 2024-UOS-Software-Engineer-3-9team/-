@@ -5,15 +5,26 @@ import { CalendarTodayIcon } from "./icons/CalendarTodayIcon"; // CalendarTodayI
 import { CheckBoxOutlineBlankIcon } from "./icons/CheckBoxOutlineBlankIcon"; // CheckBoxOutlineBlankIcon import
 
 import { Box, Button, Checkbox, IconButton, Typography } from "@mui/material";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { TouchableOpacity } from 'react-native';
 
 interface DaysDetailScreenProps {
-  onBackPress: () => void;
+  onCalenderPress: () => void;
+  onProjectLobbyPress: () => void;
+  onSchedulePress: () => void;
+  onGenerateTaskPress: () => void;
 }
 
-const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
+const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ 
+  onCalenderPress,
+  onProjectLobbyPress,
+  onSchedulePress,
+  onGenerateTaskPress,
+}) => {
+
+  const [activeTab, setActiveTab] = useState<"캘린더" | "구성원" | "스케쥴">("캘린더");
   return (
-    <Box
+    <Box                        //전체 컨테이너
       sx={{
         backgroundColor: "#4d9cff",
         display: "flex",
@@ -21,7 +32,7 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
         width: "100%",
       }}
     >
-      <Box
+      <Box                  // Java Jpanel같은 느낌으로 바깥 부분.
         sx={{
           backgroundColor: "#4d9cff",
           overflow: "hidden",
@@ -30,6 +41,18 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
           position: "relative",
         }}
       >
+          <Typography       //프로젝트 이름
+            variant="h3"
+            sx={{
+              position: "absolute",
+              top: 51,
+              left: 24,
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            일조매 개발
+          </Typography>
         <Box           //여기가 흰색 배경임
           sx={{
             position: "absolute",
@@ -39,7 +62,7 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
             left: 24,
           }}
         >
-          <Box
+          <Box       //Ongoing 배치 구역
             sx={{
               position: "absolute",
               width: 312,
@@ -50,7 +73,7 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
             }}
           />
 
-          <Box
+          <Box        //Ongoing 텍스트배치 구역
             sx={{
               position: "absolute",
               width: 312,
@@ -59,7 +82,7 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
               left: 0,
             }}
           >
-            <Box
+            <Box    //Ongoing 텍스트배치 관련
               sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -71,7 +94,7 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
                 left: 0,
               }}
             >
-              <Box
+              <Box    //Ongoing 텍스트배치 관련
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -90,42 +113,17 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
                 </Typography>
               </Box>
 
-              <Box
+              <Box     // Ongoing의 각 멤버 정보 관련 저장한 박스
                 sx={{ display: "flex", flexDirection: "column", width: "100%" }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    width: "90%",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2.5,
-                      px: 2.5,
-                      py: 0,
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{ fontWeight: "bold", color: "black" }}
-                    >
-                      자료 조사
-                    </Typography>
-                  </Box>
-
-                  <Box
+                <Box        //사람, 체크박스, 독촉하기 버튼 그룹 1
                     sx={{
                       display: "flex",
                       alignItems: "center",
                       gap: 1,
                       px: 2.5,
                       py: 0,
-                      width: "100%",
+                      width: "90%",
                     }}
                   >
                     <Typography
@@ -150,10 +148,8 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
                     >
                       독촉하기
                     </Button>
-                  </Box>
                 </Box>
-
-                <Box
+                <Box      //사람, 체크박스, 독촉하기 버튼 그룹 2
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -186,8 +182,7 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
                     독촉하기
                   </Button>
                 </Box>
-
-                <Box
+                <Box      //사람, 체크박스, 독촉하기 버튼 그룹 3
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -223,7 +218,7 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
               </Box>
             </Box>
 
-            <Box
+            <Box   //Completed Text 구역
               sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -235,7 +230,7 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
                 left: 0,
               }}
             >
-              <Box
+              <Box // Completed text 표기용
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -254,17 +249,17 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
                 </Typography>
               </Box>
 
-              <Box
+              <Box  // Completed 세부 항목
                 sx={{ display: "flex", flexDirection: "column", width: "100%" }}
               >
-                <Box
+                <Box  //세부 항목이 들어가는 박스 
                   sx={{
                     display: "flex",
                     flexDirection: "column",
                     width: "100%",
                   }}
                 >
-                  <Box
+                  <Box   //세부 항목 1
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -286,7 +281,29 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
                     </Typography>
                   </Box>
 
-                  <Box
+                  <Box    //세부 항목 2
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 2.5,
+                      py: 0,
+                      width: "100%",
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "black",
+                        textDecoration: "line-through",
+                      }}
+                    >
+                      유지호
+                    </Typography>
+                  </Box>
+
+                  <Box    //세부 항목 3
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -308,132 +325,37 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
                   </Box>
-                </Box>
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    px: 2.5,
-                    py: 0,
-                    width: "100%",
-                  }}
-                >
-                  <Typography
-                    variant="body1"
+                  <Box    //세부 항목 4
                     sx={{
-                      fontWeight: "bold",
-                      color: "black",
-                      textDecoration: "line-through",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 2.5,
+                      py: 0,
+                      width: "100%",
                     }}
                   >
-                    구효근
-                  </Typography>
-                  <Box sx={{ flexGrow: 1 }} />
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "black",
+                        textDecoration: "line-through",
+                      }}
+                    >
+                      유지호
+                    </Typography>
+                    <Box sx={{ flexGrow: 1 }} />
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }} //기타 세팅
+                  /> 
+                  </Box>
                 </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    px: 2.5,
-                    py: 0,
-                    width: "100%",
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: "bold",
-                      color: "black",
-                      textDecoration: "line-through",
-                    }}
-                  >
-                    김나린
-                  </Typography>
-                  <Box sx={{ flexGrow: 1 }} />
-                </Box>
-              </Box>
             </Box>
           </Box>
         </Box>
-
-        <Box
-          sx={{ position: "absolute", width: 158, height: 28, top: 708, left: 93 }}
-        >
-          <Button
-            variant="contained"
-            sx={{
-              width: 156,
-              height: 28,
-              backgroundColor: "#4d9cff",
-              borderRadius: 1,
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ color: "white", fontWeight: "bold" }}
-            >
-              Task 만들기
-            </Typography>
-          </Button>
-        </Box>
-
-        <Box
-          sx={{ position: "absolute", width: 214, height: 53, top: 190, left: 35 }}
-        >
-          <Box sx={{ width: 218, height: 53 }}>
-            <Box sx={{ position: "relative", width: 214, height: 53 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  position: "absolute",
-                  top: 30,
-                  left: 0,
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-              >
-                11월 27일 오후 3시
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-              >
-                다음 미팅
-              </Typography>
-              <Button
-                variant="contained"
-                sx={{
-                  position: "absolute",
-                  top: 4,
-                  left: 100,
-                  width: 48,
-                  height: 23,
-                  backgroundColor: "#4d9cff",
-                  borderRadius: 1,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{ color: "white", fontWeight: "bold" }}
-                >
-                  관리
-                </Typography>
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-
-        <Box
+        <Box              //상단 날짜 이동 구역 (양 버튼과 날짜)
           sx={{ position: "absolute", width: 278, height: 29, top: 140, left: 40 }}
         >
           <Typography
@@ -475,82 +397,141 @@ const DaysDetailScreen: React.FC<DaysDetailScreenProps> = ({ onBackPress }) => {
             <ArrowBackIcon sx={{ color: "white" }} />
           </IconButton>
         </Box>
-
-          <Typography
-            variant="h3"
-            sx={{
-              position: "absolute",
-              top: 51,
-              left: 24,
-              color: "white",
-              fontWeight: "bold",
-            }}
+        <Box sx={{ position: "relative", width: 214, height: 53, top: 190, left: 35 }}     //다음 미팅 관련 구역
           >
-            일조매 개발
-          </Typography>
-
-          <Box
-            sx={{
-              position: "absolute",
-              width: 361,
-              height: 36,
-              top: 765,
-              left: 0,
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Button
+            <Typography
+              variant="h6"
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                fontWeight: "bold",
+                color: "black",
+              }}
+            >
+              다음 미팅
+            </Typography>
+            <Typography       //다음 미팅 날짜
+              variant="h6"
+              sx={{
+                position: "absolute",
+                top: 30,
+                left: 0,
+                fontWeight: "bold",
+                color: "black",
+              }}
+            >
+              11월 27일 오후 3시
+            </Typography>
+            <Button     //관리 버튼
               variant="contained"
               sx={{
-                width: 120,
-                height: 36,
+                position: "absolute",
+                top: 4,
+                left: 100,
+                width: 48,
+                height: 23,
                 backgroundColor: "#4d9cff",
                 borderRadius: 1,
               }}
             >
               <Typography
-                variant="h6"
+                variant="body2"
                 sx={{ color: "white", fontWeight: "bold" }}
               >
-                캘린더
+                관리
               </Typography>
             </Button>
-            <Button
-              variant="contained"
-              sx={{
-                width: 120,
-                height: 36,
-                backgroundColor: "white",
-                borderRadius: 1,
-              }}
+        </Box>
+        <Box        //Task 만들기 버튼을 붙일 패널
+          sx={{ position: "absolute", width: 158, height: 28, top: 708, left: 93 }}
+        >
+          <Button   //Task 만들기 버튼
+            variant="contained"
+            sx={{
+              width: 156,
+              height: 28,
+              backgroundColor: "#4d9cff",
+              borderRadius: 1,
+            }}
+            onClick={() => {
+              onGenerateTaskPress();}
+            }
+          >
+            <Typography
+              variant="h6"
+              sx={{ color: "white", fontWeight: "bold" }}
             >
-              <Typography
-                variant="h6"
-                sx={{ color: "black", fontWeight: "bold" }}
-              >
-                구성원
-              </Typography>
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                width: 120,
-                height: 36,
-                backgroundColor: "white",
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ color: "black", fontWeight: "bold" }}
-              >
-                스케쥴
-              </Typography>
-            </Button>
-          </Box>
+              Task 만들기
+            </Typography>
+          </Button>
+        </Box>
+        
+        <Box     //하단 바 완성
+          sx={{
+            position: 'absolute',
+            width: 361,
+            height: 36,
+            top: 765,
+            left: 0,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '캘린더' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}
+            onClick={() => {
+              setActiveTab('캘린더');
+              onCalenderPress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '캘린더' ? 'white' : 'black', fontWeight: 'bold' }}>
+              캘린더
+            </Typography>
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '구성원' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}            
+            onClick={() => {
+              setActiveTab('구성원');
+              onProjectLobbyPress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '구성원' ? 'white' : 'black', fontWeight: 'bold' }}>
+              구성원
+            </Typography>
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '스케쥴' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}
+            onClick={() => {
+              setActiveTab('스케쥴');
+              onSchedulePress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '스케쥴' ? 'white' : 'black', fontWeight: 'bold' }}>
+              스케쥴
+            </Typography>
+          </Button>
         </Box>
       </Box>
+    </Box>
   );
 };
 

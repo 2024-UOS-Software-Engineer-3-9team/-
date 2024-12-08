@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "reac
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface InviteScreenProps {
-  onBackPress: () => void;
   projId: string; // 프로젝트 ID를 prop으로 받음
+  onBackPress: () => void;
 }
 
 const InviteScreen: React.FC<InviteScreenProps> = ({ onBackPress, projId }) => {

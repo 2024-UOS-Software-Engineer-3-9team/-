@@ -1,26 +1,85 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useProject } from './context/ProjectContext';
 
 interface ProjectLobbyScreenProps {
   onBackPress: () => void;
   onAlarmPress: () => void;
   onAddMemberPress: () => void;
   onSchedulePress: () => void;
+  onCalendarPress: () => void; // 캘린더 화면으로 이동하는 콜백 추가
 }
-
-const participants = [
-  { id: "1", name: "구준표", role: "UI, React API", tasks: ["과제 제출 준비 (~11/18)", "클래스 다이어그램 (~11/17)"] },
-  { id: "2", name: "문준혁", role: "UI, React API", tasks: ["UI 요소 작업 (~11/18)", "레이아웃 만들기 (~11/17)"] },
-  { id: "3", name: "유지호", role: "UI, 기획", tasks: ["UI creative 작업 (~11/18)"] },
-];
 
 const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   onBackPress,
   onAlarmPress,
   onAddMemberPress,
   onSchedulePress,
+  onCalendarPress, // 캘린더 화면으로 이동하는 콜백 추가
 }) => {
-  const [activeTab, setActiveTab] = useState<"구성원" | "스케줄">("구성원");
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [projectData, setProjectData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"캘린더" | "구성원" | "스케줄">("구성원"); // 탭 상태 추가
+  const { projectId, leader, setProjectId, setLeader } = useProject();
+
+  // AsyncStorage에서 토큰 가져오기
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("accessToken");
+        if (storedToken) {
+          setAccessToken(storedToken);
+        } else {
+          Alert.alert("오류", "로그인이 필요합니다. 다시 로그인 해주세요.");
+        }
+      } catch (error) {
+        console.error("토큰 가져오기 실패:", error);
+        Alert.alert("오류", "토큰을 가져오는 중 문제가 발생했습니다.");
+      }
+    };
+
+    fetchAccessToken();
+  }, []);
+  
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      if (!accessToken) return;
+
+      try {
+        const response = await fetch(
+          `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const transformedData = data.map((item: any) => ({
+            id: item[0],
+            name: item[1],
+          }));
+
+          setProjectData(transformedData);
+        } else if (response.status === 400) {
+          const errorData = await response.json();
+          Alert.alert("실패", errorData.message || "요청이 실패했습니다.");
+        } else {
+          Alert.alert("실패", "알 수 없는 오류가 발생했습니다.");
+        }
+      } catch (error) {
+        console.error(error);
+        Alert.alert("에러", "네트워크 오류가 발생했습니다.");
+      }
+    };
+
+    fetchProjectData();
+  }, [accessToken, projectId]);
 
   return (
     <View style={styles.container}>
@@ -33,18 +92,13 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
           <Text style={styles.alarmButton}>🔔</Text>
         </TouchableOpacity>
       </View>
+
       {activeTab === "구성원" && (
         <FlatList
-          data={participants}
+          data={projectData}
           renderItem={({ item }) => (
             <View style={styles.participantCard}>
               <Text style={styles.cardTitle}>{item.name}</Text>
-              <Text style={styles.cardRole}>({item.role})</Text>
-              {item.tasks.map((task, index) => (
-                <Text key={index} style={styles.cardTask}>
-                  {index + 1}. {task}
-                </Text>
-              ))}
               <TouchableOpacity style={styles.cardButton}>
                 <Text style={styles.cardButtonText}>독촉하기</Text>
               </TouchableOpacity>
@@ -54,13 +108,25 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
           contentContainerStyle={styles.list}
         />
       )}
+
       <View style={styles.footer}>
+        <TouchableOpacity
+          style={[styles.footerButton, activeTab === "캘린더" && styles.activeButton]}
+          onPress={() => {
+            setActiveTab("캘린더");
+            onCalendarPress();
+          }}
+        >
+          <Text style={styles.footerButtonText}>캘린더</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={[styles.footerButton, activeTab === "구성원" && styles.activeButton]}
           onPress={() => setActiveTab("구성원")}
         >
           <Text style={styles.footerButtonText}>구성원</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[styles.footerButton, activeTab === "스케줄" && styles.activeButton]}
           onPress={() => {
@@ -71,6 +137,7 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
           <Text style={styles.footerButtonText}>스케줄</Text>
         </TouchableOpacity>
       </View>
+
       <TouchableOpacity style={styles.addButton} onPress={onAddMemberPress}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
@@ -93,8 +160,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cardTitle: { fontSize: 16, fontWeight: "bold" },
-  cardRole: { fontSize: 12, color: "#555" },
-  cardTask: { fontSize: 12, marginTop: 4 },
   cardButton: {
     marginTop: 8,
     backgroundColor: "#0066FF",
@@ -109,12 +174,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     paddingVertical: 12,
   },
-  footerButton: { flex: 1, alignItems: "center", paddingVertical: 8 },
-  activeButton: { backgroundColor: "#003C8F" },
-  footerButtonText: { color: "#FFFFFF", fontSize: 14 },
+  footerButton: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  activeButton: {
+    backgroundColor: "#003C8F", // 활성화된 버튼은 파란색
+  },
+  footerButtonText: { color: "#000000", fontSize: 14 },
   addButton: {
     position: "absolute",
-    bottom: 16,
+    bottom: 80,
     right: 16,
     backgroundColor: "#FFFFFF",
     width: 56,

@@ -15,23 +15,43 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 interface GenerateTaskScreenProps {
-  onBackPress: () => void;
+  onCalenderPress: () => void;
+  onProjectLobbyPress: () => void;
+  onSchedulePress: () => void;
 }
 
-const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ onBackPress }) => {
+const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({
+  onCalenderPress,
+  onProjectLobbyPress,
+  onSchedulePress,
+}) => {
+
+  const [activeTab, setActiveTab] = useState<"캘린더" | "구성원" | "스케쥴">("캘린더");
   return (
-    <Box
+    <Box                        //전체 파란색 배경
       sx={{
         backgroundColor: "#4d9cff",
         display: "flex",
         justifyContent: "center",
         width: "100%",
-        height: "100vh",
       }}
     >
+      <Typography       //프로젝트 이름
+        variant="h3"
+        sx={{
+          position: "absolute",
+          top: 40,
+          left: 250,
+          color: "white",
+          fontWeight: "bold",
+          zIndex: 10,
+        }}
+      >
+        일조매 개발
+      </Typography>
       <Container
         sx={{
           backgroundColor: "#4d9cff",
@@ -45,29 +65,18 @@ const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ onBackPress }) 
             position: "absolute",
             width: 312,
             height: 621,
-            top: 124,
-            left: 24,
+            top: 102,
+            left: 10,
             backgroundColor: "white",
             padding: 2,
           }}
         >
-          <Typography variant="h4" fontWeight="bold" sx={{ mb: 2 }}>
+          <Typography 
+          variant="h4" fontWeight="bold" sx={{ mb: 2 }}>
             Task 생성
           </Typography>
 
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="h6" fontWeight="bold">
-              Task 이름
-            </Typography>
-            <TextField
-              variant="outlined"
-              fullWidth
-              sx={{ mt: 1 }}
-              placeholder="Task 이름"
-            />
-          </Box>
-
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 2 }}> 
             <Typography variant="h6" fontWeight="bold">
               마감시한
             </Typography>
@@ -189,69 +198,87 @@ const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ onBackPress }) 
             <Button
               variant="contained"
               sx={{ backgroundColor: "#4d9cff", borderRadius: 1 }}
+              onClick={() => {
+                setActiveTab('캘린더');
+                onCalenderPress();}
+              }
             >
               뒤로가기
             </Button>
             <Button
               variant="contained"
               sx={{ backgroundColor: "#4d9cff", borderRadius: 1 }}
+              onClick={() => {
+                setActiveTab('캘린더');
+                onCalenderPress();}
+              }
             >
               확인
             </Button>
           </Box>
         </Box>
-
-        <Box
-          sx={{
-            position: "fixed",
-            width: 360,
-            height: 91,
-            top: 0,
-            left: 0,
-            backgroundColor: "#4d9cff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: 2,
-          }}
-        >
-          <Typography variant="h4" fontWeight="bold" color="white">
-            일조매 개발
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <NotificationsIcon sx={{ color: "white", mr: 2 }} />
-            <ArrowBackIcon sx={{ color: "white" }} />
-          </Box>
-        </Box>
        
-        <Box
+        <Box     //하단 바 완성
           sx={{
-            position: "absolute",
-            width: 360,
-            height: 30,
-            bottom: 0,
+            position: 'absolute',
+            width: 361,
+            height: 36,
+            top: 765,
             left: 0,
-            display: "flex",
-            justifyContent: "space-around",
-            backgroundColor: "#4d9cff",
-            padding: 1,
+            display: 'flex',
+            justifyContent: 'space-between',
           }}
         >
           <Button
-            startIcon={<CalendarTodayIcon />}
-            sx={{ variant:"h6", color: "white", flex: 1 }}
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '캘린더' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}
+            onClick={() => {
+              setActiveTab('캘린더');
+              onCalenderPress();}
+            }
           >
-            캘린더
+            <Typography variant="h6" sx={{ color: activeTab === '캘린더' ? 'white' : 'black', fontWeight: 'bold' }}>
+              캘린더
+            </Typography>
           </Button>
-          <Button 
-            startIcon={<GroupIcon />} 
-            sx={{ variant:"h6", color: "black", flex: 1, backgroundColor: "#ffffff", }}>
-            구성원
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '구성원' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}            
+            onClick={() => {
+              setActiveTab('구성원');
+              onProjectLobbyPress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '구성원' ? 'white' : 'black', fontWeight: 'bold' }}>
+              구성원
+            </Typography>
           </Button>
-          <Button 
-            startIcon={<ScheduleIcon />}            
-            sx={{ variant:"h6", color: "black", flex: 1, backgroundColor: "#ffffff", }}>
-            스케쥴
+          <Button
+            variant="contained"
+            sx={{
+              width: 120,
+              height: 36,
+              backgroundColor: activeTab === '스케쥴' ? '#4d9cff' : 'white',
+              borderRadius: 1,
+            }}
+            onClick={() => {
+              setActiveTab('스케쥴');
+              onSchedulePress();}
+            }
+          >
+            <Typography variant="h6" sx={{ color: activeTab === '스케쥴' ? 'white' : 'black', fontWeight: 'bold' }}>
+              스케쥴
+            </Typography>
           </Button>
         </Box>
       </Container>
