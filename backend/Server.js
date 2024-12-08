@@ -347,26 +347,45 @@ app.post("/projects/:proj_id/invite", authenticateToken, async (req,res) => {
 // });
 
 //스케쥴 등록
+
 app.post("/projects/:proj_id/addschedule", authenticateToken, async(req, res) => {
     const { proj_id } = req.params;
     const { time, date_meet } = req.body;
     const { user_id } = req.user;
     let connection;
-    try{
+    try {
         connection = await connectToDatabase();
-        if(!connection){
+        if(!connection) {
             return res.status(500).send("DB 연결에 실패했습니다.");
         }
-        await connection.execute(
-            "INSERT INTO TABLE_SCHEDULE (PROJ_ID, USER_ID, TIME, DATE_MEET) VALUES (:proj_id, :user_id, :time,TO_DATE(:date_meet, 'YYYY-MM-DD'))",
-            {proj_id, user_id, time, date_meet},
-            {autoCommit:true}
+
+        // 기존 스케줄 조회
+        const result = await connection.execute(
+            "SELECT * FROM TABLE_SCHEDULE WHERE PROJ_ID = :proj_id AND USER_ID = :user_id AND DATE_MEET = TO_DATE(:date_meet, 'YYYY-MM-DD')",
+            { proj_id, user_id, date_meet }
         );
-        res.status(201).send("스케쥴이 성공적으로 등록되었습니다.");
-    }catch(err){
+
+        if (result.rows && result.rows.length > 0) {
+            // 기존 스케줄이 있으면 update
+            await connection.execute(
+                "UPDATE TABLE_SCHEDULE SET TIME = :time WHERE PROJ_ID = :proj_id AND USER_ID = :user_id AND DATE_MEET = TO_DATE(:date_meet, 'YYYY-MM-DD')",
+                { time, proj_id, user_id, date_meet },
+                { autoCommit: true }
+            );
+            res.status(200).send("스케줄이 성공적으로 업데이트되었습니다.");
+        } else {
+            // 기존 스케줄이 없으면 insert
+            await connection.execute(
+                "INSERT INTO TABLE_SCHEDULE (PROJ_ID, USER_ID, TIME, DATE_MEET) VALUES (:proj_id, :user_id, :time, TO_DATE(:date_meet, 'YYYY-MM-DD'))",
+                { proj_id, user_id, time, date_meet },
+                { autoCommit: true }
+            );
+            res.status(201).send("스케줄이 성공적으로 등록되었습니다.");
+        }
+    } catch(err) {
         console.error(err);
-        res.status(500).send("스케쥴 등록 중 오류가 발생했습니다.");
-    }finally{
+        res.status(500).send("스케줄 등록 또는 업데이트 중 오류가 발생했습니다.");
+    } finally {
         await closeConnection(connection);
     }
 });
@@ -389,6 +408,35 @@ app.get("/projects/:proj_id/schedules", authenticateToken, async (req, res) => {
         const result = await connection.execute(
             "SELECT SCHEDULE_ID, USER_ID, TIME, DATE_MEET FROM TABLE_SCHEDULE WHERE PROJ_ID = :proj_id AND DATE_MEET BETWEEN TO_DATE(:start_day || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:end_day || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')",
             {proj_id, start_day, end_day}
+        );
+        res.json(result.rows);
+    }catch(err){
+        console.error(err);
+        res.status(500).send("스케쥴 조회 중 오류가 발생했습니다.");
+    }finally{
+        await closeConnection(connection);
+    }
+});
+
+//나의 스케쥴 조회(스케쥴화면 띄울때)
+app.get("/projects/:proj_id/myschedules", authenticateToken, async (req, res) => {
+    const { proj_id } = req.params;
+    const { start_day, end_day } = req.query;      //한 주의 시작과 끝
+    const { user_id } = req.user;
+    let connection;
+    try{
+        connection = await connectToDatabase();
+        if(!connection){
+            return res.status(500).send("DB 연결에 실패했습니다.");
+        }
+
+        if (!start_day || !end_day) {
+            return res.status(400).send("start_day와 end_day는 필수 입력값입니다.");
+        }
+
+        const result = await connection.execute(
+            "SELECT SCHEDULE_ID, USER_ID, TIME, DATE_MEET FROM TABLE_SCHEDULE WHERE PROJ_ID = :proj_id AND DATE_MEET BETWEEN TO_DATE(:start_day || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND TO_DATE(:end_day || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') AND USER_ID = :user_id",
+            {proj_id, start_day, end_day, user_id}
         );
         res.json(result.rows);
     }catch(err){
