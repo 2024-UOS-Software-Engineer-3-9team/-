@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useProject } from './context/ProjectContext';
+import { sendNotification } from './api/notification';
 
 interface ProjectLobbyScreenProps {
   onBackPress: () => void;
@@ -92,6 +93,27 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     }
   };
 
+  const handleReminderPress = async (userId: string) => {
+    console.log(userId)
+    if (!accessToken) {
+      Alert.alert("오류", "액세스 토큰이 없습니다. 다시 로그인 해주세요.");
+      return;
+    }
+
+    try {
+      await sendNotification(
+        projectId, 
+        `누군가가 나를 독촉했습니다!!!`, 
+        [userId], 
+        accessToken
+      );
+      Alert.alert("성공", "알림이 성공적으로 전송되었습니다.");
+    } catch (error) {
+      console.error("알림 전송 중 오류 발생:", error);
+      Alert.alert("에러", "알림을 전송하는 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -110,7 +132,10 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
           renderItem={({ item }) => (
             <View style={styles.participantCard}>
               <Text style={styles.cardTitle}>{item.name}</Text>
-              <TouchableOpacity style={styles.cardButton}>
+              <TouchableOpacity 
+                style={styles.cardButton} 
+                onPress={() => handleReminderPress(item.id)} // 🔥 독촉하기 버튼에 추가
+              >
                 <Text style={styles.cardButtonText}>독촉하기</Text>
               </TouchableOpacity>
             </View>
