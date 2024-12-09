@@ -56,6 +56,7 @@ const MakeProjectScreen: React.FC<MakeProjectScreenProps> = ({ onBackPress }) =>
       if (response.ok) {
         const data = await response.json();
         Alert.alert("성공", data.message);
+        onBackPress();
       } else {
         const errorData = await response.json();
         Alert.alert("실패", errorData.message || "프로젝트 생성에 실패했습니다.");

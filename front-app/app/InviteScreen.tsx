@@ -56,6 +56,7 @@ const InviteScreen: React.FC<InviteScreenProps> = ({ onBackPress, projId }) => {
 
       if (response.status === 201) {
         Alert.alert("성공", "팀원이 성공적으로 초대되었습니다.");
+        onBackPress();
       } else if (response.status === 400) {
         const errorData = await response.json();
         Alert.alert("실패", errorData.message || "초대 요청이 실패했습니다.");
