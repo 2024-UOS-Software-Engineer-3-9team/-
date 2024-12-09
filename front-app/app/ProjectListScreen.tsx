@@ -25,7 +25,7 @@ const ProjectListScreen: React.FC<ProjectListScreenProps> = ({
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const { projectId, leader, setProjectId, setLeader } = useProject();
+  const { setProjectId, setLeader } = useProject();
 
   // AsyncStorage에서 토큰을 가져오는 함수
   const fetchToken = async () => {

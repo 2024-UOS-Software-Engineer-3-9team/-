@@ -16,8 +16,8 @@ import ScheduleLobbyScreen from "./ScheduleLobbyScreen";
 // import InsertSchedulePopup from "./InsertSchedulePopup";
 import CalenderLobbyScreen from "./CalenderLobbyScreen";
 import DaysDetailScreen from "./DaysDetailScreen";
-import GenerateTaskScreen from "./GenerateTaskScreen";
-import TODOModifyTaskPopup from "./TODOModifyTaskPopup";
+// import GenerateTaskScreen from "./GenerateTaskScreen";
+// import TODOModifyTaskPopup from "./TODOModifyTaskPopup";
 
 export default function Index() {
   const [currentScreen, setCurrentScreen] = useState<
@@ -34,8 +34,6 @@ export default function Index() {
     | "ScheduleLobby"
     | "CalenderLobby"
     | "DaysDetail"
-    | "GenerateTask"
-    | "TODOModifyTask"
   >("Splash");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); // 선택된 프로젝트 ID 저장
   const [isPopupVisible, setPopupVisible] = useState(false); // 팝업 표시 상태
@@ -106,29 +104,28 @@ export default function Index() {
         case "CalenderLobby":
           return (
             <CalenderLobbyScreen 
-            // onCalenderPress={() => setCurrentScreen("CalenderLobby")}
-            // onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
-            // onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
+            onCalenderPress={() => setCurrentScreen("CalenderLobby")}
+            onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
+            onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
             // onGenerateTaskPress={() => setCurrentScreen("GenerateTask")}
+            onBackPress={() => setCurrentScreen("ProjectLobby")}
+            setCurrentScreen={() => setCurrentScreen("DaysDetail")}
             />
           );
         case "DaysDetail":
           return (
             <DaysDetailScreen 
-            onCalenderPress={() => setCurrentScreen("CalenderLobby")}
-            onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
-            onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
-            onGenerateTaskPress={() => setCurrentScreen("GenerateTask")}
+            onBackPress={() => setCurrentScreen("CalenderLobby")}
             />
           );
-        case "GenerateTask":
-          return (
-            <GenerateTaskScreen
-            onCalenderPress={() => setCurrentScreen("CalenderLobby")}
-            onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
-            onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
-            />
-          );
+        // case "GenerateTask":
+        //   return (
+        //     <GenerateTaskScreen
+        //     onCalenderPress={() => setCurrentScreen("CalenderLobby")}
+        //     onProjectLobbyPress={() => setCurrentScreen("ProjectLobby")} 
+        //     onSchedulePress={() => setCurrentScreen("ScheduleLobby")}
+        //     />
+        //   );
       default:
         return null;
     }

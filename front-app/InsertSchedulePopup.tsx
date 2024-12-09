@@ -5,19 +5,21 @@ import { useProject } from './context/ProjectContext';
 
 interface InsertSchedulePopupProps {
   onClose: () => void; // 팝업 닫기 콜백
-  initialSelectedCells: Set<string>; // 부모에서 전달된 기존 선택 상태
-  onConfirm: (selectedCells: Set<string>) => void; // 확인 버튼 콜백
+  initialSelectedCells: Map<string, number>; // 부모에서 전달된 기존 선택 상태
+  onConfirm: (selectedCells: Map<string, number>) => void; // 확인 버튼 콜백
+  dateRange: string[];
 }
 
 const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
   onClose,
   initialSelectedCells,
   onConfirm,
+  dateRange,
 }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const days = ["11/4", "11/5", "11/6", "11/7", "11/8", "11/9", "11/10"];
+  // const days = ["11/4", "11/5", "11/6", "11/7", "11/8", "11/9", "11/10"];
   const times = [...Array(24)].map((_, i) => `${i}:00`);
-  const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
+  const [selectedCells, setSelectedCells] = useState<Map<string, number>>(new Map());
   const { projectId, leader, setProjectId, setLeader } = useProject();
 
   // 팝업이 열릴 때 초기 상태 설정
@@ -28,19 +30,26 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
     }
     else
     {
-      setSelectedCells(new Set(initialSelectedCells));
+      setSelectedCells(new Map(initialSelectedCells));
     }
   }, [initialSelectedCells]);
 
   const toggleCell = (cellKey: string) => {
     setSelectedCells((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(cellKey)) {
-        newSet.delete(cellKey);
+      const newMap = new Map(prev); // 기존 맵 복사
+      const currentCount = newMap.get(cellKey) || 0; // 현재 카운트 가져오기
+  
+      if (currentCount > 0) {
+        if (currentCount === 1) {
+          newMap.delete(cellKey); // 카운트가 1이면 셀 제거 (선택 취소)
+        } else {
+          newMap.set(cellKey, currentCount - 1); // 카운트 감소
+        }
       } else {
-        newSet.add(cellKey);
+        newMap.set(cellKey, 1); // 처음 선택 시 카운트 1로 초기화
       }
-      return newSet;
+  
+      return newMap;
     });
   };
 
@@ -63,32 +72,28 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
     fetchAccessToken();
   }, []);
 
-  const generateScheduleBinary = (selectedCells: Set<string>): string[] => {
-    const daysCount = 7; // 요일 수
-    const hoursCount = 24; // 시간 수
+  const generateScheduleBinary = (selectedCells: Map<string, number>): string[] => {
+    const daysCount = 7; // 요일 수 (열의 개수)
+    const hoursCount = 24; // 시간 수 (행의 개수)
   
-    // 초기화된 빈 배열 (요일별로 24개의 "0"으로 시작)
-    const scheduleBinary = Array(daysCount).fill("0".repeat(hoursCount));
+    const scheduleBinary = Array.from({ length: daysCount }, () => "0".repeat(hoursCount));
   
-    // `selectedCells` 데이터를 순회하며 클릭된 상태를 업데이트
-    selectedCells.forEach((cellKey) => {
-      const [row, col] = cellKey.split("-").map(Number); // 행(row)은 시간, 열(col)은 요일
+    selectedCells.forEach((count, cellKey) => {
+      const [row, col] = cellKey.split("-").map(Number); // row = 시간, col = 요일
       if (col >= 0 && col < daysCount && row >= 0 && row < hoursCount) {
         const binaryString = scheduleBinary[col];
-        // 해당 시간(row) 위치를 "1"로 변경
         scheduleBinary[col] =
           binaryString.substring(0, row) + "1" + binaryString.substring(row + 1);
       }
     });
   
     return scheduleBinary;
-  };
+  };  
 
   const handleConfirm = async () => {
-    const data_meets = ['02', '03', '04', '05', '06', '07', '08'];
     const binarySchedule = generateScheduleBinary(selectedCells);
-    for(let i=0; i<7; i++)
-    {
+    console.log(dateRange);
+    for(let i = 0; i < 7; i++) {
       try {
         const response = await fetch(
           `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/addschedule`, 
@@ -100,15 +105,14 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
             },
             body: JSON.stringify({
               time: binarySchedule[i],
-              date_meet: `2024-12-${data_meets[i]}`,
+              date_meet: dateRange[i],
             }),
           }
         );
-
+  
         if (response.ok) {
           const result = await response.json();
           Alert.alert("성공", "스케줄이 저장되었습니다.");
-          
         } else {
           const errorData = await response.json();
           Alert.alert("오류", errorData.message || "스케줄 저장에 실패했습니다.");
@@ -116,11 +120,11 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
       } catch (error) {
         console.error("API 요청 오류:", error);
         Alert.alert("에러", "스케줄 저장 중 네트워크 오류가 발생했습니다.");
-      } finally {
-        onConfirm(selectedCells); // 상태 전달 및 팝업 닫기
       }
     }
+    onConfirm(selectedCells); // 🟢 Map<string, number> 전달
   };
+  
 
   return (
     <Modal transparent={true} animationType="fade">
@@ -132,7 +136,7 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
           <ScrollView style={styles.table}>
             <View style={styles.row}>
               <Text style={styles.headerCell}></Text>
-              {days.map((day, index) => (
+              {dateRange.map((day, index) => (
                 <Text key={index} style={styles.headerCell}>
                   {day}
                 </Text>
@@ -141,7 +145,7 @@ const InsertSchedulePopup: React.FC<InsertSchedulePopupProps> = ({
             {times.map((time, rowIndex) => (
               <View key={rowIndex} style={styles.row}>
                 <Text style={styles.timeCell}>{time}</Text>
-                {days.map((_, colIndex) => {
+                {dateRange.map((_, colIndex) => {
                   const cellKey = `${rowIndex}-${colIndex}`;
                   const isSelected = selectedCells.has(cellKey);
                   return (

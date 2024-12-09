@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, ScrollView } fr
 import InsertSchedulePopup from "./InsertSchedulePopup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useProject } from './context/ProjectContext';
-import { sendNotification } from './api/notification';
 import { format, addDays } from "date-fns";
 
 interface ScheduleLobbyScreenProps {
@@ -197,12 +196,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
       });
 
       if (response.ok) {
-        Alert.alert("성공", "미팅이 설정되었습니다.");try {
-        await sendNotification(projectId, `미팅이 ${selectedDay} ${selectedTime}으로 설정되었습니다.`, [userId], accessToken);
-          console.log("알림이 성공적으로 전송되었습니다.");
-        } catch (error) {
-          console.error("알림 전송 중 오류 발생:", error);
-        }
+        Alert.alert("성공", "미팅이 설정되었습니다.");
       } else {
         const errorData = await response.json();
         Alert.alert("오류", errorData.message || "미팅 등록에 실패했습니다.");
