@@ -22,7 +22,7 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [projectData, setProjectData] = useState<any>(null);
   const [activeButton, setActiveButton] = useState<"calendar" | "member" | "schedule">("member");
-  const { projectId, leader, setProjectId, setLeader } = useProject();
+  const { projectId, userId, setCountUser } = useProject();
 
   // AsyncStorage에서 토큰 가져오기
   useEffect(() => {
@@ -66,6 +66,7 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
             name: item[1],
           }));
 
+          setCountUser(data.length);
           setProjectData(transformedData);
         } else if (response.status === 400) {
           const errorData = await response.json();
@@ -93,8 +94,8 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     }
   };
 
-  const handleReminderPress = async (userId: string) => {
-    console.log(userId)
+  const handleReminderPress = async (targetId: string) => {
+    console.log(targetId)
     if (!accessToken) {
       Alert.alert("오류", "액세스 토큰이 없습니다. 다시 로그인 해주세요.");
       return;
@@ -103,8 +104,8 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     try {
       await sendNotification(
         projectId, 
-        `누군가가 나를 독촉했습니다!!!`, 
-        [userId], 
+        `${userId}가 ${targetId}를 독촉했습니다!!!`, 
+        [userId, targetId], 
         accessToken
       );
       Alert.alert("성공", "알림이 성공적으로 전송되었습니다.");

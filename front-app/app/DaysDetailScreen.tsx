@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useProject } from './context/ProjectContext';
 import GenerateTaskScreen from "./GenerateTaskScreen"; // GenerateTaskScreen 가져오기
+import { sendNotification } from './api/notification';
 
 interface Task {
   id: string;
@@ -90,8 +91,21 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
     setTasks((prevTasks) => [...prevTasks, task]);
   };
 
-  const handleRemindButton = (taskId: string) => {
-    Alert.alert("독촉하기", `작업 ${taskId}에 대해 독촉 메시지가 전송됩니다.`);
+  const handleRemindButton = async (taskName: string, targetId: string[]) => {
+    Alert.alert("독촉하기", `작업 ${taskName}에 대해 독촉 메시지가 전송됩니다.`);
+
+    try {
+      await sendNotification(
+        projectId, 
+        `${targetId}님 ${taskName} 서둘러주세요!!`, 
+        targetId,
+        accessToken
+      );
+      Alert.alert("성공", "알림이 성공적으로 전송되었습니다.");
+    } catch (error) {
+      console.error("알림 전송 중 오류 발생:", error);
+      Alert.alert("에러", "알림을 전송하는 중 오류가 발생했습니다.");
+    }
   };
 
   const handleOpenGenerateTask = () => {
@@ -135,7 +149,7 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
                 <Text style={styles.taskTitle}>{task.title}</Text>
                 <TouchableOpacity
                   style={styles.remindButton}
-                  onPress={() => handleRemindButton(task.id)}
+                  onPress={() => handleRemindButton(task.title, task.assignees)}
                 >
                   <Text style={styles.buttonText}>독촉하기</Text>
                 </TouchableOpacity>

@@ -69,6 +69,7 @@ const ProjectListScreen: React.FC<ProjectListScreenProps> = ({
         LEADER_ID: item[2],
       }));
 
+      console.log(data.length);
       setProjects(transformedData); // 데이터를 상태에 저장
     } catch (error) {
       console.error("프로젝트를 가져오는 중 오류 발생:", error);

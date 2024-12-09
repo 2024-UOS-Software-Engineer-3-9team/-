@@ -263,7 +263,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
             </TouchableOpacity>
 
             <Text style={styles.currentWeekText}>
-              {format(selectedDate, "yyyy년 MM월 dd일")} - {format(addDays(selectedDate, 6), "MM월 dd일")}
+              {format(getDateRange()[0], "yyyy년 MM월 dd일")} - {format(getDateRange()[6], "MM월 dd일")}
             </Text>
 
             <TouchableOpacity onPress={() => changeDate("next")} style={styles.navButton}>

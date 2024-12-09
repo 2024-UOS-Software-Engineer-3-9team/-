@@ -106,11 +106,13 @@ const AlarmTeamScreen: React.FC<AlarmTeamScreenProps> = ({ onBackPress }) => {
       </View>
 
       {/* 알림 목록 */}
-      {alarms.map((alarm) => (
-        <Text key={alarm.NOTICE_ID} style={styles.alarmText}>
-          {/* {alarm.isNew && <Text style={styles.newTag}>NEW </Text>} */}
-          {`${alarm.DUEDATE.slice(0, 10)}: ${alarm.MESSAGE}`}
-        </Text>
+      {alarms
+        .sort((a, b) => new Date(a.DUEDATE as string).getTime() - new Date(b.DUEDATE as string).getTime()) // 타입 단언과 getTime() 사용
+        .map((alarm) => (
+          <Text key={alarm.NOTICE_ID} style={styles.alarmText}>
+            {/* {alarm.isNew && <Text style={styles.newTag}>NEW </Text>} */}
+            {`${alarm.DUEDATE.slice(0, 10)}: ${alarm.MESSAGE}`}
+          </Text>
       ))}
 
       {/* 버튼들 */}
