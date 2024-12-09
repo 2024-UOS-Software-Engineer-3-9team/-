@@ -32,7 +32,7 @@
 |4| 재촉 알림 기능 | 각 Task 별로 재촉 버튼이 있어 다른 팀원이 재촉 버튼을 누르면 Task 담당자의 핸드폰에 알림이 간다. |
 
 #### [Demo Video]
-- 추가 예정
+- (https://youtu.be/xPJ7QnxGDP4)
 <br>
 
 ## Project Constraints
