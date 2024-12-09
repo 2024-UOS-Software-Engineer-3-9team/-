@@ -1,34 +1,99 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  TextInput,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, TextInput } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useProject } from './context/ProjectContext';
+import { sendNotification } from './api/notification';
 
-const alarms = [
-  { id: "1", content: "자료 조사 마감 기한 연장 11.30 → 12.2", isNew: true },
-  { id: "2", content: "미팅 일정 잡기가 완료되었습니다.", isNew: true },
-  { id: "3", content: "누군가가 '미팅 일정 잡기'를 좀 빨리 하라고 독촉합니다.", isNew: true },
-];
+interface Alarm {
+  NOTICE_ID: number;
+  MESSAGE: string;
+  DUEDATE: string;
+}
 
 interface AlarmTeamScreenProps {
   onBackPress: () => void; // 뒤로 가기 콜백 추가
 }
 
 const AlarmTeamScreen: React.FC<AlarmTeamScreenProps> = ({ onBackPress }) => {
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false); // 팝업 표시 상태
   const [alarmText, setAlarmText] = useState(""); // 새로운 알림 텍스트
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const { userId, projectId } = useProject();
 
-  const handleAddAlarm = () => {
-    if (alarmText.trim()) {
-      alarms.push({ id: Date.now().toString(), content: alarmText, isNew: true });
+  // AsyncStorage에서 토큰 가져오기
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("accessToken");
+        if (storedToken) {
+          setAccessToken(storedToken);
+        } else {
+          Alert.alert("오류", "로그인이 필요합니다. 다시 로그인 해주세요.");
+        }
+      } catch (error) {
+        console.error("토큰 가져오기 실패:", error);
+        Alert.alert("오류", "토큰을 가져오는 중 문제가 발생했습니다.");
+      }
+    };
+
+    fetchAccessToken();
+    fetchAlarms();
+  }, []);
+
+  useEffect(() => {
+    if (accessToken) {
+      fetchAlarms(); // 토큰이 있을 때만 프로젝트 목록을 가져옴
+    }
+  }, [accessToken]);
+
+  // 서버에서 알람 목록을 가져오는 함수
+  const fetchAlarms = async () => {
+    if (!accessToken) {
+      console.log("토큰이 없습니다.");
+      return; // 토큰이 없으면 API 호출을 하지 않음
+    }
+
+    try {
+      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/notifications`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`, // 토큰을 Authorization 헤더에 포함
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("서버 오류");
+      }
+      
+      const data = await response.json();
+    
+      // 배열을 객체 형태로 변환
+      const transformedData = data.map((item: any) => ({
+        NOTICE_ID: item[0],
+        MESSAGE: item[1],
+        DUEDATE: item[2],
+      }));
+
+      setAlarms(transformedData); // 데이터를 상태에 저장
+    } catch (error) {
+      console.error("프로젝트를 가져오는 중 오류 발생:", error);
+    }
+  };
+
+  const handleAddAlarm = async () => {
+    if(alarmText.trim()) {
+      try {
+        await sendNotification(projectId, alarmText, [userId], accessToken);
+        console.log("알림이 성공적으로 전송되었습니다.");
+      } catch (error) {
+        console.error("알림 전송 중 오류 발생:", error);
+      }
+  
       setAlarmText(""); // 입력값 초기화
       setIsPopupVisible(false); // 팝업 닫기
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -42,9 +107,9 @@ const AlarmTeamScreen: React.FC<AlarmTeamScreenProps> = ({ onBackPress }) => {
 
       {/* 알림 목록 */}
       {alarms.map((alarm) => (
-        <Text key={alarm.id} style={styles.alarmText}>
-          {alarm.isNew && <Text style={styles.newTag}>NEW </Text>}
-          {alarm.content}
+        <Text key={alarm.NOTICE_ID} style={styles.alarmText}>
+          {/* {alarm.isNew && <Text style={styles.newTag}>NEW </Text>} */}
+          {`${alarm.DUEDATE.slice(0, 10)}: ${alarm.MESSAGE}`}
         </Text>
       ))}
 
@@ -55,9 +120,6 @@ const AlarmTeamScreen: React.FC<AlarmTeamScreenProps> = ({ onBackPress }) => {
           onPress={() => setIsPopupVisible(true)} // 팝업 열기
         >
           <Text style={styles.addButtonText}>추가</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.confirmButton}>
-          <Text style={styles.confirmButtonText}>확인</Text>
         </TouchableOpacity>
       </View>
 
@@ -127,7 +189,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#4A90E2",
     padding: 12,
     borderRadius: 8,
-    width: "45%",
+    width: "100%",
     alignItems: "center",
   },
   addButtonText: {

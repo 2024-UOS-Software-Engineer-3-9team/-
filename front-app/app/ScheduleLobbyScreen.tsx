@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, ScrollView } fr
 import InsertSchedulePopup from "./InsertSchedulePopup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useProject } from './context/ProjectContext';
+import { sendNotification } from './api/notification';
 import { format, addDays } from "date-fns";
 
 interface ScheduleLobbyScreenProps {
@@ -59,11 +60,12 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
     fetchAccessToken();
   }, []);
 
-  // 현재 주의 날짜 범위를 가져옴 (월~일)
+  // 현재 주의 월요일부터 일요일까지의 날짜를 가져옴
   const getDateRange = () => {
+    const startOfWeek = addDays(selectedDate, -((selectedDate.getDay() + 6) % 7)); // 이번 주 월요일로 보정
     let dateRange = [];
     for (let i = 0; i < 7; i++) {
-      dateRange.push(format(addDays(selectedDate, i), "yyyy-MM-dd"));
+      dateRange.push(format(addDays(startOfWeek, i), "yyyy-MM-dd"));
     }
     return dateRange;
   };
@@ -97,19 +99,17 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
   
     return selectedCells;
   };
-  
 
   useEffect(() => {
-    if (schedules.length > 0)
-    {
+    // if (schedules.length > 0)
+    // {
       setSelectedCells(getCellsFromSchedule(schedules));
-      // console.log(schedules[0].TIME[5]);
-    }
+    // }
   }, [schedules])
 
   useEffect(() => {
-    console.log(selectedCells);
-  }, [selectedCells])
+    fetchSchedules();
+  }, [selectedDate])
 
   const fetchSchedules = async() => {
     let isLeader = "myschedules";
@@ -117,8 +117,11 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
     {
       isLeader = "schedules"
     }
+    const dateRange = getDateRange();
+    const start_day = dateRange[0]; // 이번 주 월요일
+    const end_day = dateRange[6];   // 이번 주 일요일
     try {
-      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/${isLeader}?start_day=2024-12-01&end_day=2024-12-08`, {
+      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/${isLeader}?start_day=${start_day}&end_day=${end_day}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +167,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
   const onMeetingPress = (rowIndex: number, colIndex: number) => {
     if(leader == userId)
     {
-      const day = days[colIndex]; // colIndex로 요일 가져오기
+      const day = getDateRange()[colIndex]; // colIndex로 요일 가져오기
       const time = times[rowIndex]; // rowIndex로 시간 가져오기
       setSelectedDay(day);
       setSelectedTime(time);
@@ -178,8 +181,37 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
     }
   }, [accessToken]);
 
-  const handleSelectTimeConfirm = () => {
-    console.log(`회의 시간: ${selectedDay}요일, ${selectedTime}`); // 선택된 회의 시간 출력
+  const handleSelectTimeConfirm = async () => {
+    console.log(`회의 시간: ${selectedDay} ${selectedTime}`); // 선택된 회의 시간 출력
+
+    try {
+      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/schedule/makeMeet`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          duedate: `${selectedDay} ${selectedTime}`, 
+        }),
+      });
+
+      if (response.ok) {
+        Alert.alert("성공", "미팅이 설정되었습니다.");try {
+        await sendNotification(projectId, `미팅이 ${selectedDay} ${selectedTime}으로 설정되었습니다.`, [userId], accessToken);
+          console.log("알림이 성공적으로 전송되었습니다.");
+        } catch (error) {
+          console.error("알림 전송 중 오류 발생:", error);
+        }
+      } else {
+        const errorData = await response.json();
+        Alert.alert("오류", errorData.message || "미팅 등록에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("API 요청 오류:", error);
+      Alert.alert("에러", "미팅 등록 중 네트워크 오류가 발생했습니다.");
+    }
+
     setSelectTimePopupVisible(false); // 팝업 닫기
   };
 
@@ -275,7 +307,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
           <View style={styles.popupContent}>
             <Text style={styles.popupTitle}>회의 시간 설정</Text>
             <Text style={styles.popupMessage}>
-              {selectedDay}요일, {selectedTime}을 회의 시간으로 하시겠습니까?
+              {selectedDay} {selectedTime}을 회의 시간으로 하시겠습니까?
             </Text>
             <View style={styles.buttonRow}>
               <TouchableOpacity style={styles.actionButton} onPress={handleSelectTimeConfirm}>
@@ -329,6 +361,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
           initialSelectedCells={new Map(selectedCells)}
           onClose={closeInsertSchedulePopup}
           onConfirm={openInsertSchedulePopup}
+          dateRange={getDateRange()}
         />
       )}
     </View>

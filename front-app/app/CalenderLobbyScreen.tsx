@@ -131,10 +131,12 @@ const markTaskAsComplete = async (taskId: string) => {
     return tasks.filter((task: task) => task.date === date);
   };
 
+  // 현재 주의 월요일부터 일요일까지의 날짜를 가져옴
   const getDateRange = () => {
+    const startOfWeek = addDays(selectedDate, -((selectedDate.getDay() + 6) % 7)); // 이번 주 월요일로 보정
     let dateRange = [];
     for (let i = 0; i < 7; i++) {
-      dateRange.push(format(addDays(selectedDate, i), "yyyy-MM-dd"));
+      dateRange.push(format(addDays(startOfWeek, i), "yyyy-MM-dd"));
     }
     return dateRange;
   };
