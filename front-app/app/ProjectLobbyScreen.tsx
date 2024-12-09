@@ -102,7 +102,7 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     }
 
     try {
-      await sendNotification(
+      sendNotification(
         projectId, 
         `${userId}가 ${targetId}를 독촉했습니다!!!`, 
         [userId, targetId], 

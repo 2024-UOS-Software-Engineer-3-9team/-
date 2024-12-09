@@ -95,7 +95,7 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
     Alert.alert("독촉하기", `작업 ${taskName}에 대해 독촉 메시지가 전송됩니다.`);
 
     try {
-      await sendNotification(
+      sendNotification(
         projectId, 
         `${targetId}님 ${taskName} 서둘러주세요!!`, 
         targetId,
