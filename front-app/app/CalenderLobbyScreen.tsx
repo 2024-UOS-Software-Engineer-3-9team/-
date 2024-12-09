@@ -4,6 +4,7 @@ import { format, addDays } from "date-fns";
 import GenerateTaskScreen from "./GenerateTaskScreen";
 import { useProject } from './context/ProjectContext';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Int32 } from "react-native/Libraries/Types/CodegenTypes";
 
 interface ProjectLobbyScreenProps {
   onCalenderPress: () => void;
@@ -12,6 +13,14 @@ interface ProjectLobbyScreenProps {
   onBackPress: () => void;
   setCurrentScreen: (screen: string) => void; 
   setChosenDate: (date: string) => void; 
+}
+
+interface task{
+  id: string,
+  date: string,
+  task: string,
+  isDone: Int32,
+  users: string[],
 }
 
 const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
@@ -48,10 +57,6 @@ useEffect(() => {
 
   initializeData();
 }, []);
-
-useEffect(() => {
-  console.log(tasks);
-}, [tasks])
 
 const fetchTasksFromServer = async (accessToken: string) => {
   try {
@@ -109,7 +114,7 @@ const markTaskAsComplete = async (taskId: string) => {
       return;
     }
 
-    const updatedTasks = tasks.map(task => 
+    const updatedTasks = tasks.map((task: task) => 
       task.id === taskId ? { ...task, isDone: 1 } : task
     );
     setTasks(updatedTasks);
@@ -123,7 +128,7 @@ const markTaskAsComplete = async (taskId: string) => {
 
 
   const getTasksForDate = (date: string) => {
-    return tasks.filter((task) => task.date === date);
+    return tasks.filter((task: task) => task.date === date);
   };
 
   const getDateRange = () => {
@@ -204,7 +209,7 @@ const markTaskAsComplete = async (taskId: string) => {
                   onPress={() => handleDatePress(date)} 
                 >
                   <Text style={styles.tableHeaderCell}>{format(new Date(date), "MM/dd")}</Text>
-                  {getTasksForDate(date).map((task) => (
+                  {getTasksForDate(date).map((task: task) => (
                     <Text key={task.id} style={styles.taskText}>
                       {task.task}
                     </Text>
@@ -233,7 +238,7 @@ const markTaskAsComplete = async (taskId: string) => {
           <Text style={styles.title}>작업 목록</Text>
           <FlatList
             data={tasks}
-            renderItem={({ item }) => (
+            renderItem={({ item }: { item: task }) => (
               <View style={styles.taskItem}>
                 <Text style={styles.taskText}>작업명: {item.task}</Text>
                 <Text style={styles.taskText}>마감일: {item.date}</Text>
@@ -487,4 +492,3 @@ const styles = StyleSheet.create({
 });
 
 export default CalendarLobbyScreen;
-
