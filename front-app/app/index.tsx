@@ -110,7 +110,6 @@ export default function Index() {
             // onGenerateTaskPress={() => setCurrentScreen("GenerateTask")}
             onBackPress={() => setCurrentScreen("ProjectLobby")}
             setCurrentScreen={() => setCurrentScreen("DaysDetail")}
-            setChosenDate={() => setCurrentScreen("DaysDetail")}
             />
           );
         case "DaysDetail":

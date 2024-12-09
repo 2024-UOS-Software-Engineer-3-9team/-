@@ -12,7 +12,6 @@ interface ProjectLobbyScreenProps {
   onSchedulePress: () => void;
   onBackPress: () => void;
   setCurrentScreen: (screen: string) => void; 
-  setChosenDate: (date: string) => void; 
 }
 
 interface task{
@@ -29,15 +28,14 @@ const CalendarLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   onSchedulePress,
   onBackPress,
   setCurrentScreen,
-  setChosenDate,
 }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeButton, setActiveButton] = useState<"calendar" | "member" | "schedule">("calendar");
   const [showNotices, setShowNotices] = useState(false);
   const [isTaskModalVisible, setTaskModalVisible] = useState(false); 
   const [tasks, setTasks] = useState([]); 
-  const { projectId, leader, setProjectId, setLeader } = useProject();
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const { projectId, setDate } = useProject();
+  const [ accessToken, setAccessToken ] = useState<string | null>(null);
 
 useEffect(() => {
   const initializeData = async () => {
@@ -176,7 +174,7 @@ const markTaskAsComplete = async (taskId: string) => {
   };
 
   const handleDatePress = (date: string) => {
-    setChosenDate(date); 
+    setDate(date);
     setCurrentScreen("DaysDetail"); 
   };
 
@@ -239,7 +237,9 @@ const markTaskAsComplete = async (taskId: string) => {
         <View style={styles.taskListContainer}>
           <Text style={styles.title}>작업 목록</Text>
           <FlatList
-            data={tasks}
+            data={tasks
+              .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            }
             renderItem={({ item }: { item: task }) => (
               <View style={styles.taskItem}>
                 <Text style={styles.taskText}>작업명: {item.task}</Text>
@@ -247,16 +247,17 @@ const markTaskAsComplete = async (taskId: string) => {
                 <TouchableOpacity
                   style={styles.completeButton}
                   onPress={() => markTaskAsComplete(item.id)} 
-                  disabled={item.isDone === 1} // 🔥 완료된 경우 비활성화
+                  disabled={item.isDone === 1}
                 >
                   <Text style={styles.completeButtonText}>
-                  {item.isDone === 1 ? "완료됨" : "완료"} </Text>
+                    {item.isDone === 1 ? "완료됨" : "완료"} 
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
-            keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()} // 🔥 고유 키 보장
-
+            keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
           />
+
         </View>
 
         <TouchableOpacity style={styles.createTaskButton} onPress={handleOpenGenerateTask}>

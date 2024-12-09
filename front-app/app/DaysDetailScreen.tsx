@@ -9,6 +9,7 @@ import GenerateTaskScreen from "./GenerateTaskScreen"; // GenerateTaskScreen 가
 interface Task {
   id: string;
   title: string;
+  dueDate: string;
   assignees: string[];
   status: "ongoing" | "completed";
 }
@@ -16,9 +17,9 @@ interface Task {
 const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }) => {
   const [isTaskModalVisible, setTaskModalVisible] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  // const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const { projectId } = useProject();
+  const { projectId, date } = useProject();
   const navigation = useNavigation(); 
 
   // 📢 서버에서 작업 목록 가져오기
@@ -62,9 +63,11 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
       }
 
       const data = await response.json();
+      
       const formattedTasks = data.map((task: any) => ({
         id: task.taskId.toString(),
         title: task.taskName,
+        dueDate: task.dueDate,
         assignees: task.userIds,
         status: task.isDone === 1 ? "completed" : "ongoing",
       }));
@@ -112,25 +115,20 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.goBackButton} onPress={onBackPress}>
-        <Text style={styles.buttonText}>뒤로가기</Text>
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onBackPress}>
+          <Text style={styles.backButton}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>일조매 개발</Text>
+      </View>
 
       <Text style={styles.dateText}>{date}</Text>
-
-      <View style={styles.buttonsRow}>
-        <Text style={styles.meetingText} onPress={handleMeetingSchedule}>
-          미팅 일정
-        </Text>
-        <Text style={styles.manageText} onPress={handleManageButton}>
-          관리
-        </Text>
-      </View>
 
       <Text style={styles.sectionTitle}>진행 중인 작업</Text>
       <ScrollView style={styles.taskContainer}>
         {tasks
-          .filter((task) => task.status === "ongoing")
+          .filter((task) => task.status === "ongoing" && task.dueDate > date)
+          .sort((a, b) => new Date((a.dueDate as string).slice(0, 10)).getTime() - new Date((b.dueDate as string).slice(0, 10)).getTime())
           .map((task) => (
             <View key={task.id} style={styles.taskItem}>
               <View style={styles.taskRow}>
@@ -143,6 +141,7 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
                 </TouchableOpacity>
               </View>
               <Text>할당인원: {task.assignees.join(", ")}</Text>
+              <Text>마감기한: {task.dueDate.slice(0, 10)}</Text>
             </View>
           ))}
       </ScrollView>
@@ -150,7 +149,7 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
       <Text style={styles.sectionTitle}>완료된 작업</Text>
       <ScrollView style={styles.taskContainer}>
         {tasks
-          .filter((task) => task.status === "completed")
+          .filter((task) => task.status === "completed" && task.dueDate > date)
           .map((task) => (
             <View key={task.id} style={styles.taskItem}>
               <Text style={styles.taskTitle}>{task.title}</Text>
@@ -174,10 +173,24 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
     backgroundColor: "#4A90E2",
-    padding: 20,
+    padding: 16,
+    position: "relative",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  backButton: {
+    color: "#FFFFFF",
+    fontSize: 20,
+  },
+  headerTitle: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
   },
   goBackButton: {
     backgroundColor: "#5C99B2",

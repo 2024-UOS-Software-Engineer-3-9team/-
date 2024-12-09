@@ -23,7 +23,8 @@ export const ProjectProvider = ({ children }: { children: React.ReactNode }) => 
   const [date, setDate] = useState<string | null>(null);
 
   return (
-    <ProjectContext.Provider value={{ userId, setUserId, countUser, setCountUser, projectId, setProjectId, leader, setLeader, date, setDate }}>
+    <ProjectContext.Provider value={{ userId, setUserId, countUser, setCountUser, projectId, setProjectId, leader, setLeader,
+                                     date, setDate }}>
       {children}
     </ProjectContext.Provider>
   );
