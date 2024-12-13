@@ -5,18 +5,22 @@ import { useProject } from './context/ProjectContext';
 import { format } from 'date-fns';
 
 interface GenerateTaskScreenProps {
+  edit: boolean;
+  task_id: string|undefined;
   visible: boolean;
   onClose: () => void;
-  onSave: (task: { deadline: string; assignees: string[] }) => void;
+  onSave: (task: { task_id: string; deadline: string; assignees: string[] }) => void;
 }
 
-const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ visible, onClose, onSave }) => {
+const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ edit, task_id, visible, onClose, onSave }) => {
   const [deadline, setDeadline] = useState("");
   const [assignees, setAssignees] = useState<string[]>([]);
   const [newAssignee, setNewAssignee] = useState("");
   const [taskName, setTaskName] = useState("");
   const { projectId } = useProject();
   const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  let method = 'POST'
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -64,16 +68,21 @@ const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ visible, onClos
     }
 
     const requestBody = {
+      task_id: task_id,
       task_name: taskName.trim(),
       duedate: deadline, // duedate 포맷을 "YYYY-MM-DD"로 변환
       user_ids: assignees,
     };
     console.log('보내는 데이터:', requestBody); // 확인용 콘솔 로그
 
+    if(edit)
+    {
+      method = 'PUT';
+    }
 
     try {
-      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/tasks/make`, {
-        method: 'POST',
+      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/tasks/${edit? 'modify' : 'make'}`, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
@@ -89,10 +98,10 @@ const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ visible, onClos
         return;
       }
 
-      const responseData = await response.json();
+      const responseData = await response.text();
       console.log('서버 응답:', responseData);
       Alert.alert("성공", "작업이 성공적으로 저장되었습니다.");
-      onSave({ deadline, assignees });
+      onSave({ task_id, deadline, assignees });
       onClose();
     } catch (error) {
       console.error('작업 생성 중 오류 발생:', error);
@@ -109,7 +118,7 @@ const GenerateTaskScreen: React.FC<GenerateTaskScreenProps> = ({ visible, onClos
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.title}>작업 생성</Text>
+          <Text style={styles.title}>{edit ? '작업 수정' : '작업 생성'}</Text>
 
           {/* 작업명 입력 */}
           <Text style={styles.label}>작업명</Text>

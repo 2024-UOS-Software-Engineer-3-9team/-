@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, TextInput } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, TextInput, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useProject } from './context/ProjectContext';
 
@@ -90,15 +90,17 @@ const AlarmAllScreen: React.FC<AlarmAllScreenProps> = ({ onBackPress }) => {
         <Text style={styles.title}>알림 목록</Text>
       </View>
 
-      {/* 알림 목록 */}
-      {alarms
-        .sort((a, b) => new Date(a.DUEDATE as string).getTime() - new Date(b.DUEDATE as string).getTime()) // 타입 단언과 getTime() 사용
-        .map((alarm) => (
-          <Text key={alarm.NOTICE_ID} style={styles.alarmText}>
-            {/* {alarm.isNew && <Text style={styles.newTag}>NEW </Text>} */}
-            {`${alarm.DUEDATE.slice(0, 10)}: ${alarm.MESSAGE}`}
-          </Text>
-      ))}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* 알림 목록 */}
+        {alarms
+          .sort((a, b) => new Date(b.DUEDATE as string).getTime() - new Date(a.DUEDATE as string).getTime()) // 타입 단언과 getTime() 사용
+          .map((alarm) => (
+            <Text key={alarm.NOTICE_ID} style={styles.alarmText}>
+              {/* {alarm.isNew && <Text style={styles.newTag}>NEW </Text>} */}
+              {`${alarm.PROJ_NAME}-${alarm.DUEDATE.slice(0, 10)}: ${alarm.MESSAGE}`}
+            </Text>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -108,6 +110,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: "#FFFFFF",
+  },
+  scrollContainer: {
+    paddingBottom: 60,
   },
   header: {
     flexDirection: "row",

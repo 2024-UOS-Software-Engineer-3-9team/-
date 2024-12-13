@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Modal, TextInput } from "react-native";
 import { format } from "date-fns";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useProject } from './context/ProjectContext';
-import GenerateTaskScreen from "./GenerateTaskScreen"; // GenerateTaskScreen 가져오기
 import { sendNotification } from './api/notification';
+import GenerateTaskScreen from "./GenerateTaskScreen";
 
 interface Task {
   id: string;
@@ -18,12 +18,10 @@ interface Task {
 const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }) => {
   const [isTaskModalVisible, setTaskModalVisible] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
-  // const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [task, setTask] = useState<Task>();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const { projectId, date } = useProject();
-  const navigation = useNavigation(); 
 
-  // 📢 서버에서 작업 목록 가져오기
   useEffect(() => {
     const fetchAccessToken = async () => {
       try {
@@ -64,7 +62,6 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
       }
 
       const data = await response.json();
-      
       const formattedTasks = data.map((task: any) => ({
         id: task.taskId.toString(),
         title: task.taskName,
@@ -79,12 +76,9 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
     }
   };
 
-  const handleMeetingSchedule = () => {
-    Alert.alert("미팅 일정", "미팅 일정이 표시됩니다.");
-  };
-
-  const handleManageButton = () => {
-    Alert.alert("관리 버튼", "관리 옵션이 표시됩니다.");
+  const handleOpenEditModal = (task: Task) => {
+    setTask(task);
+    setTaskModalVisible(true);
   };
 
   const handleAddTask = (task: Task) => {
@@ -116,13 +110,14 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
     setTaskModalVisible(false);
   };
 
-  const handleSaveTask = (task: { deadline: string; assignees: string[] }) => {
+  const handleSaveTask = (task: { task_id: string|undefined; deadline: string; assignees: string[] }) => {
     const newTask: Task = {
       id: new Date().toISOString(),
       title: "새 작업",
       assignees: task.assignees,
       status: "ongoing",
     };
+    console.log(newTask);
     handleAddTask(newTask);
     setTaskModalVisible(false);
   };
@@ -149,12 +144,18 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
                 <Text style={styles.taskTitle}>{task.title}</Text>
                 <TouchableOpacity
                   style={styles.remindButton}
-                  onPress={() => handleRemindButton(task.title, task.assignees)}
+                  onPress={() => handleRemindButton(task.title, task.assignees.map(assignee => assignee.nickname))}
                 >
                   <Text style={styles.buttonText}>독촉하기</Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.remindButton}
+                  onPress={() => handleOpenEditModal(task)}
+                >
+                  <Text style={styles.buttonText}>수정</Text>
+                </TouchableOpacity>
               </View>
-              <Text>할당인원: {task.assignees.join(", ")}</Text>
+              <Text>할당인원: {task.assignees.map(assignee => assignee.nickname).join(", ")}</Text>
               <Text>마감기한: {task.dueDate.slice(0, 10)}</Text>
             </View>
           ))}
@@ -167,7 +168,7 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
           .map((task) => (
             <View key={task.id} style={styles.taskItem}>
               <Text style={styles.taskTitle}>{task.title}</Text>
-              <Text>할당인원: {task.assignees.join(", ")}</Text>
+              <Text>할당인원: {task.assignees.map(assignee => assignee.nickname).join(", ")}</Text>
             </View>
           ))}
       </ScrollView>
@@ -177,6 +178,8 @@ const DaysDetailScreen: React.FC<{ onBackPress: () => void }> = ({ onBackPress }
       </TouchableOpacity>
 
       <GenerateTaskScreen
+        edit = {true}
+        task_id= {task?.id}
         visible={isTaskModalVisible}
         onClose={handleCloseGenerateTask}
         onSave={handleSaveTask}

@@ -82,7 +82,7 @@ const fetchTasksFromServer = async (accessToken: string) => {
       date: task.dueDate.slice(0, 10),
       task: task.taskName,
       isDone: task.isDone,
-      users: task.userIds,
+      users: task.userIds, //userID, nickname
     }));
     setTasks(formattedTasks);
   } catch (error) {
@@ -168,7 +168,7 @@ const markTaskAsComplete = async (taskId: string) => {
     setTaskModalVisible(false); 
   };
 
-  const handleSaveTask = (task: { deadline: string; assignees: string[] }) => {
+  const handleSaveTask = (task: { task_id: string; deadline: string; assignees: string[] }) => {
     console.log("작업 저장:", task);
     setTaskModalVisible(false); 
   };
@@ -239,6 +239,7 @@ const markTaskAsComplete = async (taskId: string) => {
           <FlatList
             data={tasks
               .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+              .slice(0, 10)
             }
             renderItem={({ item }: { item: task }) => (
               <View style={styles.taskItem}>
@@ -265,6 +266,8 @@ const markTaskAsComplete = async (taskId: string) => {
         </TouchableOpacity>
 
         <GenerateTaskScreen
+          edit = {false}
+          task_id= {""}
           visible={isTaskModalVisible}
           onClose={handleCloseGenerateTask}
           onSave={handleSaveTask}

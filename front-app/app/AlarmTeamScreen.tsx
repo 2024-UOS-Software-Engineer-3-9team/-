@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, TextInput } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, TextInput, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useProject } from './context/ProjectContext';
 import { sendNotification } from './api/notification';
@@ -105,46 +105,48 @@ const AlarmTeamScreen: React.FC<AlarmTeamScreenProps> = ({ onBackPress }) => {
         <Text style={styles.title}>알림 목록</Text>
       </View>
 
-      {/* 알림 목록 */}
-      {alarms
-        .sort((a, b) => new Date(a.DUEDATE as string).getTime() - new Date(b.DUEDATE as string).getTime()) // 타입 단언과 getTime() 사용
-        .map((alarm) => (
-          <Text key={alarm.NOTICE_ID} style={styles.alarmText}>
-            {/* {alarm.isNew && <Text style={styles.newTag}>NEW </Text>} */}
-            {`${alarm.DUEDATE.slice(0, 10)}: ${alarm.MESSAGE}`}
-          </Text>
-      ))}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* 알림 목록 */}
+        {alarms
+          .sort((a, b) => new Date(b.DUEDATE as string).getTime() - new Date(a.DUEDATE as string).getTime()) // 타입 단언과 getTime() 사용
+          .map((alarm) => (
+            <Text key={alarm.NOTICE_ID} style={styles.alarmText}>
+              {/* {alarm.isNew && <Text style={styles.newTag}>NEW </Text>} */}
+              {`${alarm.DUEDATE.slice(0, 10)}: ${alarm.MESSAGE}`}
+            </Text>
+        ))}
 
-      {/* 버튼들 */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setIsPopupVisible(true)} // 팝업 열기
-        >
-          <Text style={styles.addButtonText}>추가</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 팝업 구현 */}
-      <Modal
-        visible={isPopupVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsPopupVisible(false)} // 뒤로가기 버튼 처리
-      >
-        <View style={styles.popupContainer}>
-          <Text style={styles.popupTitle}>알림 내용 입력</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="알림 내용을 입력하세요"
-            value={alarmText}
-            onChangeText={setAlarmText}
-          />
-          <TouchableOpacity style={styles.popupConfirmButton} onPress={handleAddAlarm}>
-            <Text style={styles.popupConfirmButtonText}>확인</Text>
+        {/* 버튼들 */}
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => setIsPopupVisible(true)} // 팝업 열기
+          >
+            <Text style={styles.addButtonText}>추가</Text>
           </TouchableOpacity>
         </View>
-      </Modal>
+
+        {/* 팝업 구현 */}
+        <Modal
+          visible={isPopupVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setIsPopupVisible(false)} // 뒤로가기 버튼 처리
+        >
+          <View style={styles.popupContainer}>
+            <Text style={styles.popupTitle}>알림 내용 입력</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="알림 내용을 입력하세요"
+              value={alarmText}
+              onChangeText={setAlarmText}
+            />
+            <TouchableOpacity style={styles.popupConfirmButton} onPress={handleAddAlarm}>
+              <Text style={styles.popupConfirmButtonText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </ScrollView>
     </View>
   );
 };
@@ -154,6 +156,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: "#FFFFFF",
+  },
+  scrollContainer: {
+    paddingBottom: 60,
   },
   header: {
     flexDirection: "row",

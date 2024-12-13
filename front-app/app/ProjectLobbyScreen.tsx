@@ -22,7 +22,7 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [projectData, setProjectData] = useState<any>(null);
   const [activeButton, setActiveButton] = useState<"calendar" | "member" | "schedule">("member");
-  const { projectId, userId, setCountUser } = useProject();
+  const { projectId, userId, leader, setLeader, setCountUser } = useProject();
 
   // AsyncStorage에서 토큰 가져오기
   useEffect(() => {
@@ -95,7 +95,6 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
   };
 
   const handleReminderPress = async (targetId: string) => {
-    console.log(targetId)
     if (!accessToken) {
       Alert.alert("오류", "액세스 토큰이 없습니다. 다시 로그인 해주세요.");
       return;
@@ -112,6 +111,44 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
     } catch (error) {
       console.error("알림 전송 중 오류 발생:", error);
       Alert.alert("에러", "알림을 전송하는 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleDelegatePress = async (targetId: string) => {
+    console.log(targetId)
+    if (!accessToken) {
+      Alert.alert("오류", "액세스 토큰이 없습니다. 다시 로그인 해주세요.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/changeLeader`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            new_leader_id: targetId,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setLeader(targetId);
+        Alert.alert("성공", "프로젝트 리더가 성공적으로 변경되었습니다.");
+      } else if (response.status === 404) {
+        Alert.alert("실패", "프로젝트를 찾을 수 없습니다.");
+      } else if (response.status === 400) {
+        Alert.alert("실패", "새 리더가 프로젝트 멤버가 아닙니다.");
+      } else {
+        Alert.alert("실패", "알 수 없는 오류가 발생했습니다.");
+      }
+    } catch (error) {
+      console.error("네트워크 오류 발생:", error);
+      Alert.alert("에러", "네트워크 오류가 발생했습니다.");
     }
   };
 
@@ -139,6 +176,14 @@ const ProjectLobbyScreen: React.FC<ProjectLobbyScreenProps> = ({
               >
                 <Text style={styles.cardButtonText}>독촉하기</Text>
               </TouchableOpacity>
+              {userId === leader && (
+                <TouchableOpacity 
+                  style={styles.cardButton} 
+                  onPress={() => handleDelegatePress(item.id)} 
+                >
+                  <Text style={styles.cardButtonText}>팀장위임</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
           keyExtractor={(item) => item.id}

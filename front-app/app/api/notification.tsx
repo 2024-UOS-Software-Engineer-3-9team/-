@@ -13,6 +13,7 @@ Notifications.setNotificationHandler({
 });
 
 export const sendNotification = async (projectId: string, message: string, userIds: string, accessToken: string) => {
+  console.log(userIds);
   try {
     const response = await fetch(
       `http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/makeNotification`, 
@@ -55,7 +56,7 @@ export const sendNotification = async (projectId: string, message: string, userI
 export const pushNotifications = async (expoPushToken, title, message) => {
   try {
     const response = await fetch(
-      `http://210.101.75.235:3000/push-notification`, 
+      `http://3.35.3.104:3000/push-notification`, 
       {
         method: "POST",
         headers: {
@@ -101,7 +102,7 @@ export async function registerForPushNotificationsAsync() {
     console.log('Expo 푸시 토큰:', token);
   
     // 서버에 푸시 토큰을 저장합니다.
-    await fetch('http://210.101.75.235:3000/api/register-token', {
+    await fetch('http://3.35.3.104:3000/api/register-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),

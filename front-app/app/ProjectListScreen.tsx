@@ -117,7 +117,7 @@ const ProjectListScreen: React.FC<ProjectListScreenProps> = ({
     <View style={styles.container}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>11/16 (토)</Text>
+        <Text style={styles.headerTitle}></Text>
         <View style={styles.headerIcons}>
           <TouchableOpacity onPress={onAlarmPress} style={styles.iconButton}>
             <Text style={styles.icon}>🔔</Text>

@@ -18,6 +18,7 @@ interface Schedule {
   USER_ID: string;
   TIME: string;
   DATE_MEET: string;
+  NICKNAME: string;
 }
 
 const days = ["월", "화", "수", "목", "금", "토", "일"];
@@ -31,8 +32,9 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [isSelectTimePopupVisible, setSelectTimePopupVisible] = useState(false); // 회의 시간 선택 팝업
-  const [isInsertSchedulePopupVisible, setInsertSchedulePopupVisible] = useState(false); // InsertSchedulePopup
+  const [meetingCells, setMeetingCells] = useState<Set<string>>(new Set());
+  const [isSelectTimePopupVisible, setSelectTimePopupVisible] = useState(false);
+  const [isInsertSchedulePopupVisible, setInsertSchedulePopupVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [selectedCells, setSelectedCells] = useState<Map<string, number>>(new Map());
@@ -101,6 +103,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
   };
 
   useEffect(() => {
+    fetchMeetingTime();
     // if (schedules.length > 0)
     // {
       setSelectedCells(getCellsFromSchedule(schedules));
@@ -135,13 +138,20 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
       
         // 배열을 객체 형태로 변환
         const transformedData = data.map((item: any) => ({
-          SCHEDULE_ID: item[0],
-          USER_ID: item[1],
-          TIME: item[2],
-          DATE_MEET: item[3],
+          SCHEDULE_ID: item.scheduleId,
+          USER_ID: item.userId,
+          TIME: item.time,
+          DATE_MEET: item.dateMeet,
+          NICKNAME: item.nickname,
         }));
 
-        setSchedules(transformedData); // 데이터를 상태에 저장
+        const sortedData = transformedData.sort((a, b) => {
+          if (a.NICKNAME < b.NICKNAME) return -1;
+          if (a.NICKNAME > b.NICKNAME) return 1;
+          return new Date(a.DATE_MEET).getTime() - new Date(b.DATE_MEET).getTime();
+        });
+
+        setSchedules(sortedData); // 데이터를 상태에 저장
       } else {
         const errorData = await response.json();
         Alert.alert("오류", errorData.message || "스케줄 조회에 실패했습니다.");
@@ -151,6 +161,54 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
       Alert.alert("에러", "스케줄 조회 중 네트워크 오류가 발생했습니다.");
     }
   }
+
+  const fetchMeetingTime = async () => {
+    const dateRange = getDateRange();
+    const start_day = dateRange[0]; // 이번 주 월요일
+    const end_day = dateRange[6];   // 이번 주 일요일
+    try {
+      const response = await fetch(`http://ec2-43-201-54-81.ap-northeast-2.compute.amazonaws.com:3000/projects/${projectId}/meetings?start_day=${start_day}&end_day=${end_day}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+      
+        const transformedData = data.map((item: any) => ({
+          TASK_ID: item.taskId,
+          DATE: item.date,
+          TIME: item.time,
+        }));
+
+        const newMeetingCells = new Set<string>();
+  
+        transformedData.forEach(item => {
+          const dateIndex = getDateRange().indexOf(item.DATE); // DATE에 해당하는 요일 인덱스 찾기
+          if (dateIndex !== -1) {
+            for (let i = 0; i < 24; i++) {
+              if (item.TIME[i] === '1') { // TIME 문자열에서 '1'이 있는 시간 인덱스를 찾음
+                const cellKey = `${i}-${dateIndex}`; // ex: '14-3' (14시, 목요일)
+                newMeetingCells.add(cellKey); // Set에 추가 (중복 방지)
+              }
+            }
+          }
+        });
+  
+        setMeetingCells(newMeetingCells); // 상태에 저장하여 UI에 반영
+  
+        Alert.alert("성공", "미팅이 조회되었습니다.");
+      } else {
+        const errorData = await response.text();
+        Alert.alert("오류", errorData || "미팅 조회에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("API 요청 오류:", error);
+      Alert.alert("에러", "미팅 조회 중 네트워크 오류가 발생했습니다.");
+    }
+  };
 
   const calculateCellColor = (count: number) => {
     const startColor = { r: 255, g: 255, b: 255 }; // #FFFFFF
@@ -179,6 +237,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
     if (accessToken) {
       fetchSchedules(); // 토큰이 있을 때만 프로젝트 목록을 가져옴
     }
+
   }, [accessToken]);
 
   const handleSelectTimeConfirm = async () => {
@@ -286,6 +345,7 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
                 const cellKey = `${rowIndex}-${colIndex}`;
                 const count = selectedCells.get(cellKey) || 0; // 중복 카운트를 가져옴
                 const backgroundColor = calculateCellColor(count); // 색상 계산
+                const isMeetingScheduled = meetingCells.has(cellKey); // 회의 예정 여부 확인
 
                 return (
                   <TouchableOpacity
@@ -293,6 +353,9 @@ const ScheduleLobbyScreen: React.FC<ScheduleLobbyScreenProps> = ({
                     style={[styles.cell, { backgroundColor }]} // 스타일을 TouchableOpacity에 직접 추가
                     onLongPress={() => onMeetingPress(rowIndex, colIndex)} // rowIndex와 colIndex 전달
                   >
+                    {isMeetingScheduled && (
+                      <Text style={styles.meetingText}>회의예정</Text> // 회의예정 텍스트 추가
+                    )}
                   </TouchableOpacity>
                 );
               })}
@@ -441,9 +504,19 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: "#CCCCCC",
   },
+  meetingText: {
+    fontSize: 10,
+    color: 'red',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    textAlignVertical: 'center',
+  },
   selectedCell: {
     backgroundColor: "green",
-  },// 팝업 관련 스타일
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
