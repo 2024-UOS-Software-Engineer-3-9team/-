@@ -56,7 +56,14 @@
 | DataBase | SQL developer (ORACLE 기반) |
 
 ## Installation Guideline
-https://expo.dev/artifacts/eas/s8thF4m3nT1vmKXoE6KvB7.apk
+배포 파일 설치 </br>
+https://expo.dev/artifacts/eas/mbBU1qPT6euP1K3LrYxWFe.apk
+
+개발 환경 구축 </br>
+https://github.com/expo/expo/tree/main/templates/expo-template-default </br>
+위의 링크로 들어가서 template을 먼저 구축(통째로 다운하고 npm install)한 후</br>
+본 프로젝트의 pages(app 폴더, https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/tree/main/front-app/app) 를</br>
+다운 받은 template의 app 폴더에 붙여넣으면 됩니다!
 
 ## Project Deliverables
 | Document | Link |
