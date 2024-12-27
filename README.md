@@ -68,12 +68,12 @@ https://github.com/expo/expo/tree/main/templates/expo-template-default </br>
 ## Project Deliverables
 | Document | Link |
 |----------|-------|
-| 요구사항 분석 명세서 | https://docs.google.com/document/d/1IRIgeb5XNz910ra9g0WLj9rM0TVX-vw1BN4duwvAbQM/edit?tab=t.0 |
-| Software Architecture 및 Design| https://docs.google.com/document/d/1hl1Bny7XmfmnlSXjAgzuczXEWccSFDBqdL1j4_6CZkw/edit?tab=t.0 |
-| UI Design | https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/blob/main/UI%2C%ED%94%BC%EA%B7%B8%EB%A7%88/%EC%9D%BC%EC%A1%B0%EB%A7%A4_UI%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%84%B8%EB%B6%80%20%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7.png |
-| Coding Standard | https://docs.google.com/document/d/1OTgrz8aq_iY2동 |
+| 요구사항 분석 명세서 | https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/blob/main/artifacts/SRS_%EB%84%88%EB%82%98%ED%95%B4.docx |
+| Software Architecture 및 Design | https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/blob/main/artifacts/High-level%20Architecture%20UML%20Diagrams%20Document_%EB%84%88%EB%82%98%ED%95%B420241214.docx |
+| UI Design | https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/blob/main/artifacts/UI%20Design%20Document_%EB%84%88%EB%82%98%ED%95%B4.docx |
+| Coding Standard | https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/blob/main/artifacts/Coding%20Standard_%EB%84%88%EB%82%98%ED%95%B4.docx |
 | Code | 프론트: https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/tree/main/front-app </br>백: https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/tree/main/backend | 
-| Test case 및 결과 | https://docs.google.com/spreadsheets/d/14HvbSQ5o91nSV6EQRpNxrsIJCwlyRqYBrqiI5K-HJa8/edit?gid=195058275#gid=195058275 |
+| Test case 및 결과 | https://github.com/2024-UOS-Software-Engineer-3-9team/Small-Work-Everyday/blob/main/artifacts/%EC%9D%BC%EC%A1%B0%EB%A7%A4%ED%8C%80%20Test%20Cases.xlsx |
 
 ## Repository Structure
 | Directory Name | Contents |
